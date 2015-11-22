@@ -1,0 +1,29 @@
+{
+  "name": "undine-map",
+  "authors": [
+    "ffalt <ffalt@okfn.de>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.7",
+    "mapbox.js": "~2.2.3",
+    "leaflet.markercluster": "~0.4.0",
+    "ui-select": "https://github.com/angular-ui/ui-select.git#~0.13.2",
+    "angular-sanitize": "~1.4.8"
+  },
+  "resolutions": {
+    "angular": "~1.4.7"
+  }
+}
