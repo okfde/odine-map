@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="App">
+<head>
+	<meta charset=utf-8/>
+	<title>Undine-Map</title>
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
+	<link rel="stylesheet" href="assets/css/bundle.css">
+	<script src="assets/js/bundle.js"></script>
+</head>
+<body ng-controller="AppController">
+
+<div class="view">
+	<div id="map"></div>
+	<div id="info"></div>
+</div>
+
+<div class="sidebar">
+	<h3>Country</h3>
+	<ui-select multiple ng-model="selected.country" theme="select2">
+		<ui-select-match placeholder="Filter country...">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="o in filters.country | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
+	</ui-select>
+
+	<h3>Sector</h3>
+	<ui-select multiple ng-model="selected.sector" theme="select2">
+		<ui-select-match placeholder="Filter sector...">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="o in filters.sector | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
+	</ui-select>
+
+	<h3>Size</h3>
+	<ui-select multiple ng-model="selected.size" theme="select2">
+		<ui-select-match placeholder="Filter size...">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="o in filters.size | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
+	</ui-select>
+
+	<h3>Group</h3>
+	<ui-select multiple ng-model="selected.group" theme="select2">
+		<ui-select-match placeholder="Filter group...">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="o in filters.group | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
+	</ui-select>
+
+	<h3>Type</h3>
+	<ui-select multiple ng-model="selected.type" theme="select2">
+		<ui-select-match placeholder="Filter type...">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="o in filters.type | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
+	</ui-select>
+
+	<h3>Year</h3>
+	<ui-select multiple ng-model="selected.year" theme="select2">
+		<ui-select-match placeholder="Filter year...">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="o in filters.year | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
+	</ui-select>
+</div>
+
+</body>
+</html>
+
