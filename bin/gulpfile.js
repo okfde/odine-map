@@ -3,8 +3,10 @@ var gulp = require('gulp');
 var useref = require('gulp-useref');
 
 gulp.task('assets-img', function () {
-	return gulp.src(['../app/assets/img/**/*'])
-		.pipe(gulp.dest('../dist/assets/img'));
+	gulp.src(['../app/assets/images/**/*'])
+		.pipe(gulp.dest('../dist/assets/images'));
+	return gulp.src(['../app/assets/bower_components/mapbox.js/images/**/*'])
+		.pipe(gulp.dest('../dist/assets/images'));
 });
 
 gulp.task('assets-data', ['tsv2json'], function () {
