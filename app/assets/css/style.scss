@@ -25,16 +25,21 @@ body {
 	left: 0;
 	top: 0;
 	bottom: 0;
-	right: 280px;
+	right: 0;
 }
 
 .sidebar {
 	position: absolute;
 	width: 280px;
-	top: 0;
-	bottom: 0;
-	right: 0;
+	background-color: #fff;
+	top: 10px;
+	right: 10px;
 	padding: 20px;
+	padding-top: 10px;
+	z-index: 10;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	border-radius: 3px;
+	box-shadow: none;
 
 	h3 {
 		font-size: 14px;
