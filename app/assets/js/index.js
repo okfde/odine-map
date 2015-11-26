@@ -37,7 +37,7 @@ app.controller('AppController', function ($scope) {
 
 	L.mapbox.accessToken = 'pk.eyJ1IjoiZmZhbHQiLCJhIjoibzVMNnJxQSJ9.NoyJqnSK66uDNvfqca_kPA';
 	var map = L.mapbox.map('map')
-		.setView([52.5, 13.4], 3)
+		.setView([52.5, 13.4], 4)
 		.addLayer(L.mapbox.tileLayer('mapbox.light'));
 	var layerGroup = L.layerGroup().addTo(map);
 	var data_layers = undefined;

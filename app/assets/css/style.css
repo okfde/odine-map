@@ -40,16 +40,11 @@ body {
   height: 100%;
   weight: 100%; }
 
-#info {
+#logo {
   position: absolute;
-  top: 2em;
-  right: 1em;
-  z-index: 6;
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  padding: .5em .75em;
-  font-size: .85em;
-  display: none; }
+  top: 0.6em;
+  left: 3em;
+  z-index: 6; }
 
 .select2-container {
   margin: 0;

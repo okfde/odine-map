@@ -2,7 +2,7 @@
 <html lang="de" ng-app="App">
 <head>
 	<meta charset=utf-8/>
-	<title>Undine-Map</title>
+	<title>ODINE open data europe listing</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
 	<!-- build:css assets/css/bundle.css -->
 	<link href='assets/bower_components/mapbox.js/mapbox.css' rel='stylesheet'/>
@@ -22,8 +22,10 @@
 <body ng-controller="AppController">
 
 <div class="view">
+	<div id="logo">
+		<img src="assets/img/odine_small.png" alt="ODINE open data europe listing">
+	</div>
 	<div id="map"></div>
-	<div id="info"></div>
 </div>
 
 <div class="sidebar">
@@ -51,17 +53,17 @@
 		<ui-select-choices repeat="o in filters.group | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
 	</ui-select>
 
-	<h3>Type</h3>
-	<ui-select multiple ng-model="selected.type" theme="select2">
-		<ui-select-match placeholder="Filter type...">{{$item.name}}</ui-select-match>
-		<ui-select-choices repeat="o in filters.type | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
-	</ui-select>
+	<!--<h3>Type</h3>-->
+	<!--<ui-select multiple ng-model="selected.type" theme="select2">-->
+	<!--<ui-select-match placeholder="Filter type...">{{$item.name}}</ui-select-match>-->
+	<!--<ui-select-choices repeat="o in filters.type | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>-->
+	<!--</ui-select>-->
 
-	<h3>Year</h3>
-	<ui-select multiple ng-model="selected.year" theme="select2">
-		<ui-select-match placeholder="Filter year...">{{$item.name}}</ui-select-match>
-		<ui-select-choices repeat="o in filters.year | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
-	</ui-select>
+	<!--<h3>Year</h3>-->
+	<!--<ui-select multiple ng-model="selected.year" theme="select2">-->
+	<!--<ui-select-match placeholder="Filter year...">{{$item.name}}</ui-select-match>-->
+	<!--<ui-select-choices repeat="o in filters.year | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>-->
+	<!--</ui-select>-->
 </div>
 
 </body>
