@@ -85,15 +85,20 @@ body {
   left: 0;
   top: 0;
   bottom: 0;
-  right: 280px; }
+  right: 0; }
 
 .sidebar {
   position: absolute;
   width: 280px;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  padding: 20px; }
+  background-color: #fff;
+  top: 10px;
+  right: 10px;
+  padding: 20px;
+  padding-top: 10px;
+  z-index: 10;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  box-shadow: none; }
   .sidebar h3 {
     font-size: 14px;
     margin-top: 8px;
@@ -108,16 +113,11 @@ body {
   height: 100%;
   weight: 100%; }
 
-#info {
+#logo {
   position: absolute;
-  top: 2em;
-  right: 1em;
-  z-index: 6;
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  padding: .5em .75em;
-  font-size: .85em;
-  display: none; }
+  top: 0.6em;
+  left: 3em;
+  z-index: 6; }
 
 .select2-container {
   margin: 0;
