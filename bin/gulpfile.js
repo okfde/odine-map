@@ -3,6 +3,8 @@ var gulp = require('gulp');
 var useref = require('gulp-useref');
 
 gulp.task('assets-img', function () {
+	gulp.src(['../app/assets/img/**/*'])
+			.pipe(gulp.dest('../dist/assets/img'));
 	gulp.src(['../app/assets/css/images/**/*'])
 		.pipe(gulp.dest('../dist/assets/css/images'));
 	return gulp.src(['../app/assets/bower_components/mapbox.js/images/**/*'])
