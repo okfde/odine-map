@@ -66,12 +66,6 @@ module.exports=window.L=require("leaflet/dist/leaflet-src");
 
 //# sourceMappingURL=mapbox.js.map
 /*
- Leaflet.markercluster, Provides Beautiful Animated Marker Clustering functionality for Leaflet, a JS library for interactive maps.
- https://github.com/Leaflet/Leaflet.markercluster
- (c) 2012-2013, Dave Leaver, smartrak
-*/
-!function(t,e){L.MarkerClusterGroup=L.FeatureGroup.extend({options:{maxClusterRadius:80,iconCreateFunction:null,spiderfyOnMaxZoom:!0,showCoverageOnHover:!0,zoomToBoundsOnClick:!0,singleMarkerMode:!1,disableClusteringAtZoom:null,removeOutsideVisibleBounds:!0,animateAddingMarkers:!1,spiderfyDistanceMultiplier:1,polygonOptions:{}},initialize:function(t){L.Util.setOptions(this,t),this.options.iconCreateFunction||(this.options.iconCreateFunction=this._defaultIconCreateFunction),this._featureGroup=L.featureGroup(),this._featureGroup.on(L.FeatureGroup.EVENTS,this._propagateEvent,this),this._nonPointGroup=L.featureGroup(),this._nonPointGroup.on(L.FeatureGroup.EVENTS,this._propagateEvent,this),this._inZoomAnimation=0,this._needsClustering=[],this._needsRemoving=[],this._currentShownBounds=null,this._queue=[]},addLayer:function(t){if(t instanceof L.LayerGroup){var e=[];for(var i in t._layers)e.push(t._layers[i]);return this.addLayers(e)}if(!t.getLatLng)return this._nonPointGroup.addLayer(t),this;if(!this._map)return this._needsClustering.push(t),this;if(this.hasLayer(t))return this;this._unspiderfy&&this._unspiderfy(),this._addLayer(t,this._maxZoom);var n=t,s=this._map.getZoom();if(t.__parent)for(;n.__parent._zoom>=s;)n=n.__parent;return this._currentShownBounds.contains(n.getLatLng())&&(this.options.animateAddingMarkers?this._animationAddLayer(t,n):this._animationAddLayerNonAnimated(t,n)),this},removeLayer:function(t){if(t instanceof L.LayerGroup){var e=[];for(var i in t._layers)e.push(t._layers[i]);return this.removeLayers(e)}return t.getLatLng?this._map?t.__parent?(this._unspiderfy&&(this._unspiderfy(),this._unspiderfyLayer(t)),this._removeLayer(t,!0),this._featureGroup.hasLayer(t)&&(this._featureGroup.removeLayer(t),t.setOpacity&&t.setOpacity(1)),this):this:(!this._arraySplice(this._needsClustering,t)&&this.hasLayer(t)&&this._needsRemoving.push(t),this):(this._nonPointGroup.removeLayer(t),this)},addLayers:function(t){var e,i,n,s=this._map,r=this._featureGroup,o=this._nonPointGroup;for(e=0,i=t.length;i>e;e++)if(n=t[e],n.getLatLng){if(!this.hasLayer(n))if(s){if(this._addLayer(n,this._maxZoom),n.__parent&&2===n.__parent.getChildCount()){var a=n.__parent.getAllChildMarkers(),h=a[0]===n?a[1]:a[0];r.removeLayer(h)}}else this._needsClustering.push(n)}else o.addLayer(n);return s&&(r.eachLayer(function(t){t instanceof L.MarkerCluster&&t._iconNeedsUpdate&&t._updateIcon()}),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds)),this},removeLayers:function(t){var e,i,n,s=this._featureGroup,r=this._nonPointGroup;if(!this._map){for(e=0,i=t.length;i>e;e++)n=t[e],this._arraySplice(this._needsClustering,n),r.removeLayer(n);return this}for(e=0,i=t.length;i>e;e++)n=t[e],n.__parent?(this._removeLayer(n,!0,!0),s.hasLayer(n)&&(s.removeLayer(n),n.setOpacity&&n.setOpacity(1))):r.removeLayer(n);return this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds),s.eachLayer(function(t){t instanceof L.MarkerCluster&&t._updateIcon()}),this},clearLayers:function(){return this._map||(this._needsClustering=[],delete this._gridClusters,delete this._gridUnclustered),this._noanimationUnspiderfy&&this._noanimationUnspiderfy(),this._featureGroup.clearLayers(),this._nonPointGroup.clearLayers(),this.eachLayer(function(t){delete t.__parent}),this._map&&this._generateInitialClusters(),this},getBounds:function(){var t=new L.LatLngBounds;if(this._topClusterLevel)t.extend(this._topClusterLevel._bounds);else for(var e=this._needsClustering.length-1;e>=0;e--)t.extend(this._needsClustering[e].getLatLng());return t.extend(this._nonPointGroup.getBounds()),t},eachLayer:function(t,e){var i,n=this._needsClustering.slice();for(this._topClusterLevel&&this._topClusterLevel.getAllChildMarkers(n),i=n.length-1;i>=0;i--)t.call(e,n[i]);this._nonPointGroup.eachLayer(t,e)},getLayers:function(){var t=[];return this.eachLayer(function(e){t.push(e)}),t},getLayer:function(t){var e=null;return this.eachLayer(function(i){L.stamp(i)===t&&(e=i)}),e},hasLayer:function(t){if(!t)return!1;var e,i=this._needsClustering;for(e=i.length-1;e>=0;e--)if(i[e]===t)return!0;for(i=this._needsRemoving,e=i.length-1;e>=0;e--)if(i[e]===t)return!1;return!(!t.__parent||t.__parent._group!==this)||this._nonPointGroup.hasLayer(t)},zoomToShowLayer:function(t,e){var i=function(){if((t._icon||t.__parent._icon)&&!this._inZoomAnimation)if(this._map.off("moveend",i,this),this.off("animationend",i,this),t._icon)e();else if(t.__parent._icon){var n=function(){this.off("spiderfied",n,this),e()};this.on("spiderfied",n,this),t.__parent.spiderfy()}};t._icon&&this._map.getBounds().contains(t.getLatLng())?e():t.__parent._zoom<this._map.getZoom()?(this._map.on("moveend",i,this),this._map.panTo(t.getLatLng())):(this._map.on("moveend",i,this),this.on("animationend",i,this),this._map.setView(t.getLatLng(),t.__parent._zoom+1),t.__parent.zoomToBounds())},onAdd:function(t){this._map=t;var e,i,n;if(!isFinite(this._map.getMaxZoom()))throw"Map has no maxZoom specified";for(this._featureGroup.onAdd(t),this._nonPointGroup.onAdd(t),this._gridClusters||this._generateInitialClusters(),e=0,i=this._needsRemoving.length;i>e;e++)n=this._needsRemoving[e],this._removeLayer(n,!0);for(this._needsRemoving=[],e=0,i=this._needsClustering.length;i>e;e++)n=this._needsClustering[e],n.getLatLng?n.__parent||this._addLayer(n,this._maxZoom):this._featureGroup.addLayer(n);this._needsClustering=[],this._map.on("zoomend",this._zoomEnd,this),this._map.on("moveend",this._moveEnd,this),this._spiderfierOnAdd&&this._spiderfierOnAdd(),this._bindEvents(),this._zoom=this._map.getZoom(),this._currentShownBounds=this._getExpandedVisibleBounds(),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds)},onRemove:function(t){t.off("zoomend",this._zoomEnd,this),t.off("moveend",this._moveEnd,this),this._unbindEvents(),this._map._mapPane.className=this._map._mapPane.className.replace(" leaflet-cluster-anim",""),this._spiderfierOnRemove&&this._spiderfierOnRemove(),this._hideCoverage(),this._featureGroup.onRemove(t),this._nonPointGroup.onRemove(t),this._featureGroup.clearLayers(),this._map=null},getVisibleParent:function(t){for(var e=t;e&&!e._icon;)e=e.__parent;return e||null},_arraySplice:function(t,e){for(var i=t.length-1;i>=0;i--)if(t[i]===e)return t.splice(i,1),!0},_removeLayer:function(t,e,i){var n=this._gridClusters,s=this._gridUnclustered,r=this._featureGroup,o=this._map;if(e)for(var a=this._maxZoom;a>=0&&s[a].removeObject(t,o.project(t.getLatLng(),a));a--);var h,_=t.__parent,u=_._markers;for(this._arraySplice(u,t);_&&(_._childCount--,!(_._zoom<0));)e&&_._childCount<=1?(h=_._markers[0]===t?_._markers[1]:_._markers[0],n[_._zoom].removeObject(_,o.project(_._cLatLng,_._zoom)),s[_._zoom].addObject(h,o.project(h.getLatLng(),_._zoom)),this._arraySplice(_.__parent._childClusters,_),_.__parent._markers.push(h),h.__parent=_.__parent,_._icon&&(r.removeLayer(_),i||r.addLayer(h))):(_._recalculateBounds(),i&&_._icon||_._updateIcon()),_=_.__parent;delete t.__parent},_isOrIsParent:function(t,e){for(;e;){if(t===e)return!0;e=e.parentNode}return!1},_propagateEvent:function(t){if(t.layer instanceof L.MarkerCluster){if(t.originalEvent&&this._isOrIsParent(t.layer._icon,t.originalEvent.relatedTarget))return;t.type="cluster"+t.type}this.fire(t.type,t)},_defaultIconCreateFunction:function(t){var e=t.getChildCount(),i=" marker-cluster-";return i+=10>e?"small":100>e?"medium":"large",new L.DivIcon({html:"<div><span>"+e+"</span></div>",className:"marker-cluster"+i,iconSize:new L.Point(40,40)})},_bindEvents:function(){var t=this._map,e=this.options.spiderfyOnMaxZoom,i=this.options.showCoverageOnHover,n=this.options.zoomToBoundsOnClick;(e||n)&&this.on("clusterclick",this._zoomOrSpiderfy,this),i&&(this.on("clustermouseover",this._showCoverage,this),this.on("clustermouseout",this._hideCoverage,this),t.on("zoomend",this._hideCoverage,this))},_zoomOrSpiderfy:function(t){var e=this._map;e.getMaxZoom()===e.getZoom()?this.options.spiderfyOnMaxZoom&&t.layer.spiderfy():this.options.zoomToBoundsOnClick&&t.layer.zoomToBounds(),t.originalEvent&&13===t.originalEvent.keyCode&&e._container.focus()},_showCoverage:function(t){var e=this._map;this._inZoomAnimation||(this._shownPolygon&&e.removeLayer(this._shownPolygon),t.layer.getChildCount()>2&&t.layer!==this._spiderfied&&(this._shownPolygon=new L.Polygon(t.layer.getConvexHull(),this.options.polygonOptions),e.addLayer(this._shownPolygon)))},_hideCoverage:function(){this._shownPolygon&&(this._map.removeLayer(this._shownPolygon),this._shownPolygon=null)},_unbindEvents:function(){var t=this.options.spiderfyOnMaxZoom,e=this.options.showCoverageOnHover,i=this.options.zoomToBoundsOnClick,n=this._map;(t||i)&&this.off("clusterclick",this._zoomOrSpiderfy,this),e&&(this.off("clustermouseover",this._showCoverage,this),this.off("clustermouseout",this._hideCoverage,this),n.off("zoomend",this._hideCoverage,this))},_zoomEnd:function(){this._map&&(this._mergeSplitClusters(),this._zoom=this._map._zoom,this._currentShownBounds=this._getExpandedVisibleBounds())},_moveEnd:function(){if(!this._inZoomAnimation){var t=this._getExpandedVisibleBounds();this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,this._zoom,t),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._map._zoom,t),this._currentShownBounds=t}},_generateInitialClusters:function(){var t=this._map.getMaxZoom(),e=this.options.maxClusterRadius;this.options.disableClusteringAtZoom&&(t=this.options.disableClusteringAtZoom-1),this._maxZoom=t,this._gridClusters={},this._gridUnclustered={};for(var i=t;i>=0;i--)this._gridClusters[i]=new L.DistanceGrid(e),this._gridUnclustered[i]=new L.DistanceGrid(e);this._topClusterLevel=new L.MarkerCluster(this,-1)},_addLayer:function(t,e){var i,n,s=this._gridClusters,r=this._gridUnclustered;for(this.options.singleMarkerMode&&(t.options.icon=this.options.iconCreateFunction({getChildCount:function(){return 1},getAllChildMarkers:function(){return[t]}}));e>=0;e--){i=this._map.project(t.getLatLng(),e);var o=s[e].getNearObject(i);if(o)return o._addChild(t),t.__parent=o,void 0;if(o=r[e].getNearObject(i)){var a=o.__parent;a&&this._removeLayer(o,!1);var h=new L.MarkerCluster(this,e,o,t);s[e].addObject(h,this._map.project(h._cLatLng,e)),o.__parent=h,t.__parent=h;var _=h;for(n=e-1;n>a._zoom;n--)_=new L.MarkerCluster(this,n,_),s[n].addObject(_,this._map.project(o.getLatLng(),n));for(a._addChild(_),n=e;n>=0&&r[n].removeObject(o,this._map.project(o.getLatLng(),n));n--);return}r[e].addObject(t,i)}this._topClusterLevel._addChild(t),t.__parent=this._topClusterLevel},_enqueue:function(t){this._queue.push(t),this._queueTimeout||(this._queueTimeout=setTimeout(L.bind(this._processQueue,this),300))},_processQueue:function(){for(var t=0;t<this._queue.length;t++)this._queue[t].call(this);this._queue.length=0,clearTimeout(this._queueTimeout),this._queueTimeout=null},_mergeSplitClusters:function(){this._processQueue(),this._zoom<this._map._zoom&&this._currentShownBounds.contains(this._getExpandedVisibleBounds())?(this._animationStart(),this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,this._zoom,this._getExpandedVisibleBounds()),this._animationZoomIn(this._zoom,this._map._zoom)):this._zoom>this._map._zoom?(this._animationStart(),this._animationZoomOut(this._zoom,this._map._zoom)):this._moveEnd()},_getExpandedVisibleBounds:function(){if(!this.options.removeOutsideVisibleBounds)return this.getBounds();var t=this._map,e=t.getBounds(),i=e._southWest,n=e._northEast,s=L.Browser.mobile?0:Math.abs(i.lat-n.lat),r=L.Browser.mobile?0:Math.abs(i.lng-n.lng);return new L.LatLngBounds(new L.LatLng(i.lat-s,i.lng-r,!0),new L.LatLng(n.lat+s,n.lng+r,!0))},_animationAddLayerNonAnimated:function(t,e){if(e===t)this._featureGroup.addLayer(t);else if(2===e._childCount){e._addToMap();var i=e.getAllChildMarkers();this._featureGroup.removeLayer(i[0]),this._featureGroup.removeLayer(i[1])}else e._updateIcon()}}),L.MarkerClusterGroup.include(L.DomUtil.TRANSITION?{_animationStart:function(){this._map._mapPane.className+=" leaflet-cluster-anim",this._inZoomAnimation++},_animationEnd:function(){this._map&&(this._map._mapPane.className=this._map._mapPane.className.replace(" leaflet-cluster-anim","")),this._inZoomAnimation--,this.fire("animationend")},_animationZoomIn:function(t,e){var i,n=this._getExpandedVisibleBounds(),s=this._featureGroup;this._topClusterLevel._recursively(n,t,0,function(r){var o,a=r._latlng,h=r._markers;for(n.contains(a)||(a=null),r._isSingleParent()&&t+1===e?(s.removeLayer(r),r._recursivelyAddChildrenToMap(null,e,n)):(r.setOpacity(0),r._recursivelyAddChildrenToMap(a,e,n)),i=h.length-1;i>=0;i--)o=h[i],n.contains(o._latlng)||s.removeLayer(o)}),this._forceLayout(),this._topClusterLevel._recursivelyBecomeVisible(n,e),s.eachLayer(function(t){t instanceof L.MarkerCluster||!t._icon||t.setOpacity(1)}),this._topClusterLevel._recursively(n,t,e,function(t){t._recursivelyRestoreChildPositions(e)}),this._enqueue(function(){this._topClusterLevel._recursively(n,t,0,function(t){s.removeLayer(t),t.setOpacity(1)}),this._animationEnd()})},_animationZoomOut:function(t,e){this._animationZoomOutSingle(this._topClusterLevel,t-1,e),this._topClusterLevel._recursivelyAddChildrenToMap(null,e,this._getExpandedVisibleBounds()),this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,t,this._getExpandedVisibleBounds())},_animationZoomOutSingle:function(t,e,i){var n=this._getExpandedVisibleBounds();t._recursivelyAnimateChildrenInAndAddSelfToMap(n,e+1,i);var s=this;this._forceLayout(),t._recursivelyBecomeVisible(n,i),this._enqueue(function(){if(1===t._childCount){var r=t._markers[0];r.setLatLng(r.getLatLng()),r.setOpacity(1)}else t._recursively(n,i,0,function(t){t._recursivelyRemoveChildrenFromMap(n,e+1)});s._animationEnd()})},_animationAddLayer:function(t,e){var i=this,n=this._featureGroup;n.addLayer(t),e!==t&&(e._childCount>2?(e._updateIcon(),this._forceLayout(),this._animationStart(),t._setPos(this._map.latLngToLayerPoint(e.getLatLng())),t.setOpacity(0),this._enqueue(function(){n.removeLayer(t),t.setOpacity(1),i._animationEnd()})):(this._forceLayout(),i._animationStart(),i._animationZoomOutSingle(e,this._map.getMaxZoom(),this._map.getZoom())))},_forceLayout:function(){L.Util.falseFn(e.body.offsetWidth)}}:{_animationStart:function(){},_animationZoomIn:function(t,e){this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,t),this._topClusterLevel._recursivelyAddChildrenToMap(null,e,this._getExpandedVisibleBounds())},_animationZoomOut:function(t,e){this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,t),this._topClusterLevel._recursivelyAddChildrenToMap(null,e,this._getExpandedVisibleBounds())},_animationAddLayer:function(t,e){this._animationAddLayerNonAnimated(t,e)}}),L.markerClusterGroup=function(t){return new L.MarkerClusterGroup(t)},L.MarkerCluster=L.Marker.extend({initialize:function(t,e,i,n){L.Marker.prototype.initialize.call(this,i?i._cLatLng||i.getLatLng():new L.LatLng(0,0),{icon:this}),this._group=t,this._zoom=e,this._markers=[],this._childClusters=[],this._childCount=0,this._iconNeedsUpdate=!0,this._bounds=new L.LatLngBounds,i&&this._addChild(i),n&&this._addChild(n)},getAllChildMarkers:function(t){t=t||[];for(var e=this._childClusters.length-1;e>=0;e--)this._childClusters[e].getAllChildMarkers(t);for(var i=this._markers.length-1;i>=0;i--)t.push(this._markers[i]);return t},getChildCount:function(){return this._childCount},zoomToBounds:function(){for(var t,e=this._childClusters.slice(),i=this._group._map,n=i.getBoundsZoom(this._bounds),s=this._zoom+1,r=i.getZoom();e.length>0&&n>s;){s++;var o=[];for(t=0;t<e.length;t++)o=o.concat(e[t]._childClusters);e=o}n>s?this._group._map.setView(this._latlng,s):r>=n?this._group._map.setView(this._latlng,r+1):this._group._map.fitBounds(this._bounds)},getBounds:function(){var t=new L.LatLngBounds;return t.extend(this._bounds),t},_updateIcon:function(){this._iconNeedsUpdate=!0,this._icon&&this.setIcon(this)},createIcon:function(){return this._iconNeedsUpdate&&(this._iconObj=this._group.options.iconCreateFunction(this),this._iconNeedsUpdate=!1),this._iconObj.createIcon()},createShadow:function(){return this._iconObj.createShadow()},_addChild:function(t,e){this._iconNeedsUpdate=!0,this._expandBounds(t),t instanceof L.MarkerCluster?(e||(this._childClusters.push(t),t.__parent=this),this._childCount+=t._childCount):(e||this._markers.push(t),this._childCount++),this.__parent&&this.__parent._addChild(t,!0)},_expandBounds:function(t){var e,i=t._wLatLng||t._latlng;t instanceof L.MarkerCluster?(this._bounds.extend(t._bounds),e=t._childCount):(this._bounds.extend(i),e=1),this._cLatLng||(this._cLatLng=t._cLatLng||i);var n=this._childCount+e;this._wLatLng?(this._wLatLng.lat=(i.lat*e+this._wLatLng.lat*this._childCount)/n,this._wLatLng.lng=(i.lng*e+this._wLatLng.lng*this._childCount)/n):this._latlng=this._wLatLng=new L.LatLng(i.lat,i.lng)},_addToMap:function(t){t&&(this._backupLatlng=this._latlng,this.setLatLng(t)),this._group._featureGroup.addLayer(this)},_recursivelyAnimateChildrenIn:function(t,e,i){this._recursively(t,0,i-1,function(t){var i,n,s=t._markers;for(i=s.length-1;i>=0;i--)n=s[i],n._icon&&(n._setPos(e),n.setOpacity(0))},function(t){var i,n,s=t._childClusters;for(i=s.length-1;i>=0;i--)n=s[i],n._icon&&(n._setPos(e),n.setOpacity(0))})},_recursivelyAnimateChildrenInAndAddSelfToMap:function(t,e,i){this._recursively(t,i,0,function(n){n._recursivelyAnimateChildrenIn(t,n._group._map.latLngToLayerPoint(n.getLatLng()).round(),e),n._isSingleParent()&&e-1===i?(n.setOpacity(1),n._recursivelyRemoveChildrenFromMap(t,e)):n.setOpacity(0),n._addToMap()})},_recursivelyBecomeVisible:function(t,e){this._recursively(t,0,e,null,function(t){t.setOpacity(1)})},_recursivelyAddChildrenToMap:function(t,e,i){this._recursively(i,-1,e,function(n){if(e!==n._zoom)for(var s=n._markers.length-1;s>=0;s--){var r=n._markers[s];i.contains(r._latlng)&&(t&&(r._backupLatlng=r.getLatLng(),r.setLatLng(t),r.setOpacity&&r.setOpacity(0)),n._group._featureGroup.addLayer(r))}},function(e){e._addToMap(t)})},_recursivelyRestoreChildPositions:function(t){for(var e=this._markers.length-1;e>=0;e--){var i=this._markers[e];i._backupLatlng&&(i.setLatLng(i._backupLatlng),delete i._backupLatlng)}if(t-1===this._zoom)for(var n=this._childClusters.length-1;n>=0;n--)this._childClusters[n]._restorePosition();else for(var s=this._childClusters.length-1;s>=0;s--)this._childClusters[s]._recursivelyRestoreChildPositions(t)},_restorePosition:function(){this._backupLatlng&&(this.setLatLng(this._backupLatlng),delete this._backupLatlng)},_recursivelyRemoveChildrenFromMap:function(t,e,i){var n,s;this._recursively(t,-1,e-1,function(t){for(s=t._markers.length-1;s>=0;s--)n=t._markers[s],i&&i.contains(n._latlng)||(t._group._featureGroup.removeLayer(n),n.setOpacity&&n.setOpacity(1))},function(t){for(s=t._childClusters.length-1;s>=0;s--)n=t._childClusters[s],i&&i.contains(n._latlng)||(t._group._featureGroup.removeLayer(n),n.setOpacity&&n.setOpacity(1))})},_recursively:function(t,e,i,n,s){var r,o,a=this._childClusters,h=this._zoom;if(e>h)for(r=a.length-1;r>=0;r--)o=a[r],t.intersects(o._bounds)&&o._recursively(t,e,i,n,s);else if(n&&n(this),s&&this._zoom===i&&s(this),i>h)for(r=a.length-1;r>=0;r--)o=a[r],t.intersects(o._bounds)&&o._recursively(t,e,i,n,s)},_recalculateBounds:function(){var t,e=this._markers,i=this._childClusters;for(this._bounds=new L.LatLngBounds,delete this._wLatLng,t=e.length-1;t>=0;t--)this._expandBounds(e[t]);for(t=i.length-1;t>=0;t--)this._expandBounds(i[t])},_isSingleParent:function(){return this._childClusters.length>0&&this._childClusters[0]._childCount===this._childCount}}),L.DistanceGrid=function(t){this._cellSize=t,this._sqCellSize=t*t,this._grid={},this._objectPoint={}},L.DistanceGrid.prototype={addObject:function(t,e){var i=this._getCoord(e.x),n=this._getCoord(e.y),s=this._grid,r=s[n]=s[n]||{},o=r[i]=r[i]||[],a=L.Util.stamp(t);this._objectPoint[a]=e,o.push(t)},updateObject:function(t,e){this.removeObject(t),this.addObject(t,e)},removeObject:function(t,e){var i,n,s=this._getCoord(e.x),r=this._getCoord(e.y),o=this._grid,a=o[r]=o[r]||{},h=a[s]=a[s]||[];for(delete this._objectPoint[L.Util.stamp(t)],i=0,n=h.length;n>i;i++)if(h[i]===t)return h.splice(i,1),1===n&&delete a[s],!0},eachObject:function(t,e){var i,n,s,r,o,a,h,_=this._grid;for(i in _){o=_[i];for(n in o)for(a=o[n],s=0,r=a.length;r>s;s++)h=t.call(e,a[s]),h&&(s--,r--)}},getNearObject:function(t){var e,i,n,s,r,o,a,h,_=this._getCoord(t.x),u=this._getCoord(t.y),l=this._objectPoint,d=this._sqCellSize,p=null;for(e=u-1;u+1>=e;e++)if(s=this._grid[e])for(i=_-1;_+1>=i;i++)if(r=s[i])for(n=0,o=r.length;o>n;n++)a=r[n],h=this._sqDist(l[L.Util.stamp(a)],t),d>h&&(d=h,p=a);return p},_getCoord:function(t){return Math.floor(t/this._cellSize)},_sqDist:function(t,e){var i=e.x-t.x,n=e.y-t.y;return i*i+n*n}},function(){L.QuickHull={getDistant:function(t,e){var i=e[1].lat-e[0].lat,n=e[0].lng-e[1].lng;return n*(t.lat-e[0].lat)+i*(t.lng-e[0].lng)},findMostDistantPointFromBaseLine:function(t,e){var i,n,s,r=0,o=null,a=[];for(i=e.length-1;i>=0;i--)n=e[i],s=this.getDistant(n,t),s>0&&(a.push(n),s>r&&(r=s,o=n));return{maxPoint:o,newPoints:a}},buildConvexHull:function(t,e){var i=[],n=this.findMostDistantPointFromBaseLine(t,e);return n.maxPoint?(i=i.concat(this.buildConvexHull([t[0],n.maxPoint],n.newPoints)),i=i.concat(this.buildConvexHull([n.maxPoint,t[1]],n.newPoints))):[t[0]]},getConvexHull:function(t){var e,i=!1,n=!1,s=null,r=null;for(e=t.length-1;e>=0;e--){var o=t[e];(i===!1||o.lat>i)&&(s=o,i=o.lat),(n===!1||o.lat<n)&&(r=o,n=o.lat)}var a=[].concat(this.buildConvexHull([r,s],t),this.buildConvexHull([s,r],t));return a}}}(),L.MarkerCluster.include({getConvexHull:function(){var t,e,i=this.getAllChildMarkers(),n=[];for(e=i.length-1;e>=0;e--)t=i[e].getLatLng(),n.push(t);return L.QuickHull.getConvexHull(n)}}),L.MarkerCluster.include({_2PI:2*Math.PI,_circleFootSeparation:25,_circleStartAngle:Math.PI/6,_spiralFootSeparation:28,_spiralLengthStart:11,_spiralLengthFactor:5,_circleSpiralSwitchover:9,spiderfy:function(){if(this._group._spiderfied!==this&&!this._group._inZoomAnimation){var t,e=this.getAllChildMarkers(),i=this._group,n=i._map,s=n.latLngToLayerPoint(this._latlng);this._group._unspiderfy(),this._group._spiderfied=this,e.length>=this._circleSpiralSwitchover?t=this._generatePointsSpiral(e.length,s):(s.y+=10,t=this._generatePointsCircle(e.length,s)),this._animationSpiderfy(e,t)}},unspiderfy:function(t){this._group._inZoomAnimation||(this._animationUnspiderfy(t),this._group._spiderfied=null)},_generatePointsCircle:function(t,e){var i,n,s=this._group.options.spiderfyDistanceMultiplier*this._circleFootSeparation*(2+t),r=s/this._2PI,o=this._2PI/t,a=[];for(a.length=t,i=t-1;i>=0;i--)n=this._circleStartAngle+i*o,a[i]=new L.Point(e.x+r*Math.cos(n),e.y+r*Math.sin(n))._round();return a},_generatePointsSpiral:function(t,e){var i,n=this._group.options.spiderfyDistanceMultiplier*this._spiralLengthStart,s=this._group.options.spiderfyDistanceMultiplier*this._spiralFootSeparation,r=this._group.options.spiderfyDistanceMultiplier*this._spiralLengthFactor,o=0,a=[];for(a.length=t,i=t-1;i>=0;i--)o+=s/n+5e-4*i,a[i]=new L.Point(e.x+n*Math.cos(o),e.y+n*Math.sin(o))._round(),n+=this._2PI*r/o;return a},_noanimationUnspiderfy:function(){var t,e,i=this._group,n=i._map,s=i._featureGroup,r=this.getAllChildMarkers();for(this.setOpacity(1),e=r.length-1;e>=0;e--)t=r[e],s.removeLayer(t),t._preSpiderfyLatlng&&(t.setLatLng(t._preSpiderfyLatlng),delete t._preSpiderfyLatlng),t.setZIndexOffset&&t.setZIndexOffset(0),t._spiderLeg&&(n.removeLayer(t._spiderLeg),delete t._spiderLeg);i._spiderfied=null}}),L.MarkerCluster.include(L.DomUtil.TRANSITION?{SVG_ANIMATION:function(){return e.createElementNS("http://www.w3.org/2000/svg","animate").toString().indexOf("SVGAnimate")>-1}(),_animationSpiderfy:function(t,i){var n,s,r,o,a=this,h=this._group,_=h._map,u=h._featureGroup,l=_.latLngToLayerPoint(this._latlng);for(n=t.length-1;n>=0;n--)s=t[n],s.setOpacity?(s.setZIndexOffset(1e6),s.setOpacity(0),u.addLayer(s),s._setPos(l)):u.addLayer(s);h._forceLayout(),h._animationStart();var d=L.Path.SVG?0:.3,p=L.Path.SVG_NS;for(n=t.length-1;n>=0;n--)if(o=_.layerPointToLatLng(i[n]),s=t[n],s._preSpiderfyLatlng=s._latlng,s.setLatLng(o),s.setOpacity&&s.setOpacity(1),r=new L.Polyline([a._latlng,o],{weight:1.5,color:"#222",opacity:d}),_.addLayer(r),s._spiderLeg=r,L.Path.SVG&&this.SVG_ANIMATION){var c=r._path.getTotalLength();r._path.setAttribute("stroke-dasharray",c+","+c);var m=e.createElementNS(p,"animate");m.setAttribute("attributeName","stroke-dashoffset"),m.setAttribute("begin","indefinite"),m.setAttribute("from",c),m.setAttribute("to",0),m.setAttribute("dur",.25),r._path.appendChild(m),m.beginElement(),m=e.createElementNS(p,"animate"),m.setAttribute("attributeName","stroke-opacity"),m.setAttribute("attributeName","stroke-opacity"),m.setAttribute("begin","indefinite"),m.setAttribute("from",0),m.setAttribute("to",.5),m.setAttribute("dur",.25),r._path.appendChild(m),m.beginElement()}if(a.setOpacity(.3),L.Path.SVG)for(this._group._forceLayout(),n=t.length-1;n>=0;n--)s=t[n]._spiderLeg,s.options.opacity=.5,s._path.setAttribute("stroke-opacity",.5);setTimeout(function(){h._animationEnd(),h.fire("spiderfied")},200)},_animationUnspiderfy:function(t){var e,i,n,s=this._group,r=s._map,o=s._featureGroup,a=t?r._latLngToNewLayerPoint(this._latlng,t.zoom,t.center):r.latLngToLayerPoint(this._latlng),h=this.getAllChildMarkers(),_=L.Path.SVG&&this.SVG_ANIMATION;for(s._animationStart(),this.setOpacity(1),i=h.length-1;i>=0;i--)e=h[i],e._preSpiderfyLatlng&&(e.setLatLng(e._preSpiderfyLatlng),delete e._preSpiderfyLatlng,e.setOpacity?(e._setPos(a),e.setOpacity(0)):o.removeLayer(e),_&&(n=e._spiderLeg._path.childNodes[0],n.setAttribute("to",n.getAttribute("from")),n.setAttribute("from",0),n.beginElement(),n=e._spiderLeg._path.childNodes[1],n.setAttribute("from",.5),n.setAttribute("to",0),n.setAttribute("stroke-opacity",0),n.beginElement(),e._spiderLeg._path.setAttribute("stroke-opacity",0)));setTimeout(function(){var t=0;for(i=h.length-1;i>=0;i--)e=h[i],e._spiderLeg&&t++;for(i=h.length-1;i>=0;i--)e=h[i],e._spiderLeg&&(e.setOpacity&&(e.setOpacity(1),e.setZIndexOffset(0)),t>1&&o.removeLayer(e),r.removeLayer(e._spiderLeg),delete e._spiderLeg);s._animationEnd()},200)}}:{_animationSpiderfy:function(t,e){var i,n,s,r,o=this._group,a=o._map,h=o._featureGroup;for(i=t.length-1;i>=0;i--)r=a.layerPointToLatLng(e[i]),n=t[i],n._preSpiderfyLatlng=n._latlng,n.setLatLng(r),n.setZIndexOffset&&n.setZIndexOffset(1e6),h.addLayer(n),s=new L.Polyline([this._latlng,r],{weight:1.5,color:"#222"}),a.addLayer(s),n._spiderLeg=s;this.setOpacity(.3),o.fire("spiderfied")},_animationUnspiderfy:function(){this._noanimationUnspiderfy()}}),L.MarkerClusterGroup.include({_spiderfied:null,_spiderfierOnAdd:function(){this._map.on("click",this._unspiderfyWrapper,this),this._map.options.zoomAnimation&&this._map.on("zoomstart",this._unspiderfyZoomStart,this),this._map.on("zoomend",this._noanimationUnspiderfy,this),L.Path.SVG&&!L.Browser.touch&&this._map._initPathRoot()},_spiderfierOnRemove:function(){this._map.off("click",this._unspiderfyWrapper,this),this._map.off("zoomstart",this._unspiderfyZoomStart,this),this._map.off("zoomanim",this._unspiderfyZoomAnim,this),this._unspiderfy()},_unspiderfyZoomStart:function(){this._map&&this._map.on("zoomanim",this._unspiderfyZoomAnim,this)},_unspiderfyZoomAnim:function(t){L.DomUtil.hasClass(this._map._mapPane,"leaflet-touching")||(this._map.off("zoomanim",this._unspiderfyZoomAnim,this),this._unspiderfy(t))},_unspiderfyWrapper:function(){this._unspiderfy()},_unspiderfy:function(t){this._spiderfied&&this._spiderfied.unspiderfy(t)},_noanimationUnspiderfy:function(){this._spiderfied&&this._spiderfied._noanimationUnspiderfy()},_unspiderfyLayer:function(t){t._spiderLeg&&(this._featureGroup.removeLayer(t),t.setOpacity(1),t.setZIndexOffset(0),this._map.removeLayer(t._spiderLeg),delete t._spiderLeg)}})}(window,document);
-/*
  AngularJS v1.4.8
  (c) 2010-2015 Google, Inc. http://angularjs.org
  License: MIT
@@ -392,6 +386,2117 @@ c){g.push("<a ");h.isDefined(b)&&g.push('target="',b,'" ');g.push('href="',a.rep
  */
 !function(){"use strict";var e={TAB:9,ENTER:13,ESC:27,SPACE:32,LEFT:37,UP:38,RIGHT:39,DOWN:40,SHIFT:16,CTRL:17,ALT:18,PAGE_UP:33,PAGE_DOWN:34,HOME:36,END:35,BACKSPACE:8,DELETE:46,COMMAND:91,MAP:{91:"COMMAND",8:"BACKSPACE",9:"TAB",13:"ENTER",16:"SHIFT",17:"CTRL",18:"ALT",19:"PAUSEBREAK",20:"CAPSLOCK",27:"ESC",32:"SPACE",33:"PAGE_UP",34:"PAGE_DOWN",35:"END",36:"HOME",37:"LEFT",38:"UP",39:"RIGHT",40:"DOWN",43:"+",44:"PRINTSCREEN",45:"INSERT",46:"DELETE",48:"0",49:"1",50:"2",51:"3",52:"4",53:"5",54:"6",55:"7",56:"8",57:"9",59:";",61:"=",65:"A",66:"B",67:"C",68:"D",69:"E",70:"F",71:"G",72:"H",73:"I",74:"J",75:"K",76:"L",77:"M",78:"N",79:"O",80:"P",81:"Q",82:"R",83:"S",84:"T",85:"U",86:"V",87:"W",88:"X",89:"Y",90:"Z",96:"0",97:"1",98:"2",99:"3",100:"4",101:"5",102:"6",103:"7",104:"8",105:"9",106:"*",107:"+",109:"-",110:".",111:"/",112:"F1",113:"F2",114:"F3",115:"F4",116:"F5",117:"F6",118:"F7",119:"F8",120:"F9",121:"F10",122:"F11",123:"F12",144:"NUMLOCK",145:"SCROLLLOCK",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},isControl:function(t){var i=t.which;switch(i){case e.COMMAND:case e.SHIFT:case e.CTRL:case e.ALT:return!0}return t.metaKey?!0:!1},isFunctionKey:function(e){return e=e.which?e.which:e,e>=112&&123>=e},isVerticalMovement:function(t){return~[e.UP,e.DOWN].indexOf(t)},isHorizontalMovement:function(t){return~[e.LEFT,e.RIGHT,e.BACKSPACE,e.DELETE].indexOf(t)}};void 0===angular.element.prototype.querySelectorAll&&(angular.element.prototype.querySelectorAll=function(e){return angular.element(this[0].querySelectorAll(e))}),void 0===angular.element.prototype.closest&&(angular.element.prototype.closest=function(e){for(var t=this[0],i=t.matches||t.webkitMatchesSelector||t.mozMatchesSelector||t.msMatchesSelector;t;){if(i.bind(t)(e))return t;t=t.parentElement}return!1});var t=0,i=angular.module("ui.select",[]).constant("uiSelectConfig",{theme:"bootstrap",searchEnabled:!0,sortable:!1,placeholder:"",refreshDelay:1e3,closeOnSelect:!0,dropdownPosition:"auto",generateId:function(){return t++},appendToBody:!1}).service("uiSelectMinErr",function(){var e=angular.$$minErr("ui.select");return function(){var t=e.apply(this,arguments),i=t.message.replace(new RegExp("\nhttp://errors.angularjs.org/.*"),"");return new Error(i)}}).directive("uisTranscludeAppend",function(){return{link:function(e,t,i,s,c){c(e,function(e){t.append(e)})}}}).filter("highlight",function(){function e(e){return e.replace(/([.?*+^$[\]\\(){}|-])/g,"\\$1")}return function(t,i){return i&&t?t.replace(new RegExp(e(i),"gi"),'<span class="ui-select-highlight">$&</span>'):t}}).factory("uisOffset",["$document","$window",function(e,t){return function(i){var s=i[0].getBoundingClientRect();return{width:s.width||i.prop("offsetWidth"),height:s.height||i.prop("offsetHeight"),top:s.top+(t.pageYOffset||e[0].documentElement.scrollTop),left:s.left+(t.pageXOffset||e[0].documentElement.scrollLeft)}}}]);i.directive("uiSelectChoices",["uiSelectConfig","uisRepeatParser","uiSelectMinErr","$compile",function(e,t,i,s){return{restrict:"EA",require:"^uiSelect",replace:!0,transclude:!0,templateUrl:function(t){var i=t.parent().attr("theme")||e.theme;return i+"/choices.tpl.html"},compile:function(c,l){if(!l.repeat)throw i("repeat","Expected 'repeat' expression.");return function(c,l,n,a,r){var o=n.groupBy,u=n.groupFilter;if(a.parseRepeatAttr(n.repeat,o,u),a.disableChoiceExpression=n.uiDisableChoice,a.onHighlightCallback=n.onHighlight,a.dropdownPosition=n.position?n.position.toLowerCase():e.dropdownPosition,o){var d=l.querySelectorAll(".ui-select-choices-group");if(1!==d.length)throw i("rows","Expected 1 .ui-select-choices-group but got '{0}'.",d.length);d.attr("ng-repeat",t.getGroupNgRepeatExpression())}var p=l.querySelectorAll(".ui-select-choices-row");if(1!==p.length)throw i("rows","Expected 1 .ui-select-choices-row but got '{0}'.",p.length);p.attr("ng-repeat",a.parserResult.repeatExpression(o)).attr("ng-if","$select.open").attr("ng-click","$select.select("+a.parserResult.itemName+",false,$event)");var h=l.querySelectorAll(".ui-select-choices-row-inner");if(1!==h.length)throw i("rows","Expected 1 .ui-select-choices-row-inner but got '{0}'.",h.length);h.attr("uis-transclude-append",""),s(l,r)(c),c.$watch("$select.search",function(e){e&&!a.open&&a.multiple&&a.activate(!1,!0),a.activeIndex=a.tagging.isActivated?-1:0,a.refresh(n.refresh)}),n.$observe("refreshDelay",function(){var t=c.$eval(n.refreshDelay);a.refreshDelay=void 0!==t?t:e.refreshDelay})}}}}]),i.controller("uiSelectCtrl",["$scope","$element","$timeout","$filter","uisRepeatParser","uiSelectMinErr","uiSelectConfig","$parse",function(t,i,s,c,l,n,a,r){function o(){(h.resetSearchInput||void 0===h.resetSearchInput&&a.resetSearchInput)&&(h.search=g,h.selected&&h.items.length&&!h.multiple&&(h.activeIndex=h.items.indexOf(h.selected)))}function u(e,t){var i,s,c=[];for(i=0;i<t.length;i++)for(s=0;s<e.length;s++)e[s].name==[t[i]]&&c.push(e[s]);return c}function d(t){var i=!0;switch(t){case e.DOWN:!h.open&&h.multiple?h.activate(!1,!0):h.activeIndex<h.items.length-1&&h.activeIndex++;break;case e.UP:!h.open&&h.multiple?h.activate(!1,!0):(h.activeIndex>0||0===h.search.length&&h.tagging.isActivated&&h.activeIndex>-1)&&h.activeIndex--;break;case e.TAB:(!h.multiple||h.open)&&h.select(h.items[h.activeIndex],!0);break;case e.ENTER:h.open&&(h.tagging.isActivated||h.activeIndex>=0)?h.select(h.items[h.activeIndex]):h.activate(!1,!0);break;case e.ESC:h.close();break;default:i=!1}return i}function p(){var e=i.querySelectorAll(".ui-select-choices-content"),t=e.querySelectorAll(".ui-select-choices-row");if(t.length<1)throw n("choices","Expected multiple .ui-select-choices-row but got '{0}'.",t.length);if(!(h.activeIndex<0)){var s=t[h.activeIndex],c=s.offsetTop+s.clientHeight-e[0].scrollTop,l=e[0].offsetHeight;c>l?e[0].scrollTop+=c-l:c<s.clientHeight&&(h.isGrouped&&0===h.activeIndex?e[0].scrollTop=0:e[0].scrollTop-=s.clientHeight-c)}}var h=this,g="";if(h.placeholder=a.placeholder,h.searchEnabled=a.searchEnabled,h.sortable=a.sortable,h.refreshDelay=a.refreshDelay,h.removeSelected=!1,h.closeOnSelect=!0,h.search=g,h.activeIndex=0,h.items=[],h.open=!1,h.focus=!1,h.disabled=!1,h.selected=void 0,h.dropdownPosition="auto",h.focusser=void 0,h.resetSearchInput=!0,h.multiple=void 0,h.disableChoiceExpression=void 0,h.tagging={isActivated:!1,fct:void 0},h.taggingTokens={isActivated:!1,tokens:void 0},h.lockChoiceExpression=void 0,h.clickTriggeredSelect=!1,h.$filter=c,h.searchInput=i.querySelectorAll("input.ui-select-search"),1!==h.searchInput.length)throw n("searchInput","Expected 1 input.ui-select-search but got '{0}'.",h.searchInput.length);h.isEmpty=function(){return angular.isUndefined(h.selected)||null===h.selected||""===h.selected},h.activate=function(e,i){h.disabled||h.open||(i||o(),t.$broadcast("uis:activate"),h.open=!0,h.activeIndex=h.activeIndex>=h.items.length?0:h.activeIndex,-1===h.activeIndex&&h.taggingLabel!==!1&&(h.activeIndex=0),s(function(){h.search=e||h.search,h.searchInput[0].focus(),!h.tagging.isActivated&&h.items.length>1&&p()}))},h.findGroupByName=function(e){return h.groups&&h.groups.filter(function(t){return t.name===e})[0]},h.parseRepeatAttr=function(e,i,s){function c(e){var c=t.$eval(i);if(h.groups=[],angular.forEach(e,function(e){var t=angular.isFunction(c)?c(e):e[c],i=h.findGroupByName(t);i?i.items.push(e):h.groups.push({name:t,items:[e]})}),s){var l=t.$eval(s);angular.isFunction(l)?h.groups=l(h.groups):angular.isArray(l)&&(h.groups=u(h.groups,l))}h.items=[],h.groups.forEach(function(e){h.items=h.items.concat(e.items)})}function a(e){h.items=e}h.setItemsFn=i?c:a,h.parserResult=l.parse(e),h.isGrouped=!!i,h.itemProperty=h.parserResult.itemName;var o=h.parserResult.source,d=function(){var e=o(t);t.$uisSource=Object.keys(e).map(function(t){var i={};return i[h.parserResult.keyName]=t,i.value=e[t],i})};h.parserResult.keyName&&(d(),h.parserResult.source=r("$uisSource"+h.parserResult.filters),t.$watch(o,function(e,t){e!==t&&d()},!0)),h.refreshItems=function(e){e=e||h.parserResult.source(t);var i=h.selected;if(h.isEmpty()||angular.isArray(i)&&!i.length||!h.removeSelected)h.setItemsFn(e);else if(void 0!==e){var s=e.filter(function(e){return i&&i.indexOf(e)<0});h.setItemsFn(s)}("auto"===h.dropdownPosition||"up"===h.dropdownPosition)&&t.calculateDropdownPos()},t.$watchCollection(h.parserResult.source,function(e){if(void 0===e||null===e)h.items=[];else{if(!angular.isArray(e))throw n("items","Expected an array but got '{0}'.",e);h.refreshItems(e),h.ngModel.$modelValue=null}})};var f;h.refresh=function(e){void 0!==e&&(f&&s.cancel(f),f=s(function(){t.$eval(e)},h.refreshDelay))},h.isActive=function(e){if(!h.open)return!1;var t=h.items.indexOf(e[h.itemProperty]),i=t===h.activeIndex;return!i||0>t&&h.taggingLabel!==!1||0>t&&h.taggingLabel===!1?!1:(i&&!angular.isUndefined(h.onHighlightCallback)&&e.$eval(h.onHighlightCallback),i)},h.isDisabled=function(e){if(h.open){var t,i=h.items.indexOf(e[h.itemProperty]),s=!1;return i>=0&&!angular.isUndefined(h.disableChoiceExpression)&&(t=h.items[i],s=!!e.$eval(h.disableChoiceExpression),t._uiSelectChoiceDisabled=s),s}},h.select=function(e,i,c){if(void 0===e||!e._uiSelectChoiceDisabled){if(!h.items&&!h.search)return;if(!e||!e._uiSelectChoiceDisabled){if(h.tagging.isActivated){if(h.taggingLabel===!1)if(h.activeIndex<0){if(e=void 0!==h.tagging.fct?h.tagging.fct(h.search):h.search,!e||angular.equals(h.items[0],e))return}else e=h.items[h.activeIndex];else if(0===h.activeIndex){if(void 0===e)return;if(void 0!==h.tagging.fct&&"string"==typeof e){if(e=h.tagging.fct(h.search),!e)return}else"string"==typeof e&&(e=e.replace(h.taggingLabel,"").trim())}if(h.selected&&angular.isArray(h.selected)&&h.selected.filter(function(t){return angular.equals(t,e)}).length>0)return h.close(i),void 0}t.$broadcast("uis:select",e);var l={};l[h.parserResult.itemName]=e,s(function(){h.onSelectCallback(t,{$item:e,$model:h.parserResult.modelMapper(t,l)})}),h.closeOnSelect&&h.close(i),c&&"click"===c.type&&(h.clickTriggeredSelect=!0)}}},h.close=function(e){h.open&&(h.ngModel&&h.ngModel.$setTouched&&h.ngModel.$setTouched(),o(),h.open=!1,t.$broadcast("uis:close",e))},h.setFocus=function(){h.focus||h.focusInput[0].focus()},h.clear=function(e){h.select(void 0),e.stopPropagation(),s(function(){h.focusser[0].focus()},0,!1)},h.toggle=function(e){h.open?(h.close(),e.preventDefault(),e.stopPropagation()):h.activate()},h.isLocked=function(e,t){var i,s=h.selected[t];return s&&!angular.isUndefined(h.lockChoiceExpression)&&(i=!!e.$eval(h.lockChoiceExpression),s._uiSelectChoiceLocked=i),i};var v=null;h.sizeSearchInput=function(){var e=h.searchInput[0],i=h.searchInput.parent().parent()[0],c=function(){return i.clientWidth*!!e.offsetParent},l=function(t){if(0===t)return!1;var i=t-e.offsetLeft-10;return 50>i&&(i=t),h.searchInput.css("width",i+"px"),!0};h.searchInput.css("width","10px"),s(function(){null!==v||l(c())||(v=t.$watch(c,function(e){l(e)&&(v(),v=null)}))})},h.searchInput.on("keydown",function(i){var c=i.which;t.$apply(function(){var t=!1;if((h.items.length>0||h.tagging.isActivated)&&(d(c),h.taggingTokens.isActivated)){for(var l=0;l<h.taggingTokens.tokens.length;l++)h.taggingTokens.tokens[l]===e.MAP[i.keyCode]&&h.search.length>0&&(t=!0);t&&s(function(){h.searchInput.triggerHandler("tagged");var t=h.search.replace(e.MAP[i.keyCode],"").trim();h.tagging.fct&&(t=h.tagging.fct(t)),t&&h.select(t,!0)})}}),e.isVerticalMovement(c)&&h.items.length>0&&p(),(c===e.ENTER||c===e.ESC)&&(i.preventDefault(),i.stopPropagation())}),h.searchInput.on("paste",function(e){var t=e.originalEvent.clipboardData.getData("text/plain");if(t&&t.length>0&&h.taggingTokens.isActivated&&h.tagging.fct){var i=t.split(h.taggingTokens.tokens[0]);i&&i.length>0&&(angular.forEach(i,function(e){var t=h.tagging.fct(e);t&&h.select(t,!0)}),e.preventDefault(),e.stopPropagation())}}),h.searchInput.on("tagged",function(){s(function(){o()})}),t.$on("$destroy",function(){h.searchInput.off("keyup keydown tagged blur paste")})}]),i.directive("uiSelect",["$document","uiSelectConfig","uiSelectMinErr","uisOffset","$compile","$parse","$timeout",function(e,t,i,s,c,l,n){return{restrict:"EA",templateUrl:function(e,i){var s=i.theme||t.theme;return s+(angular.isDefined(i.multiple)?"/select-multiple.tpl.html":"/select.tpl.html")},replace:!0,transclude:!0,require:["uiSelect","^ngModel"],scope:!0,controller:"uiSelectCtrl",controllerAs:"$select",compile:function(c,a){return angular.isDefined(a.multiple)?c.append("<ui-select-multiple/>").removeAttr("multiple"):c.append("<ui-select-single/>"),a.inputId&&(c.querySelectorAll("input.ui-select-search")[0].id=a.inputId),function(c,a,r,o,u){function d(e){if(g.open){var t=!1;if(t=window.jQuery?window.jQuery.contains(a[0],e.target):a[0].contains(e.target),!t&&!g.clickTriggeredSelect){var i=["input","button","textarea"],s=angular.element(e.target).controller("uiSelect"),l=s&&s!==g;l||(l=~i.indexOf(e.target.tagName.toLowerCase())),g.close(l),c.$digest()}g.clickTriggeredSelect=!1}}function p(){var t=s(a);m=angular.element('<div class="ui-select-placeholder"></div>'),m[0].style.width=t.width+"px",m[0].style.height=t.height+"px",a.after(m),$=a[0].style.width,e.find("body").append(a),a[0].style.position="absolute",a[0].style.left=t.left+"px",a[0].style.top=t.top+"px",a[0].style.width=t.width+"px"}function h(){null!==m&&(m.replaceWith(a),m=null,a[0].style.position="",a[0].style.left="",a[0].style.top="",a[0].style.width=$)}var g=o[0],f=o[1];g.generatedId=t.generateId(),g.baseTitle=r.title||"Select box",g.focusserTitle=g.baseTitle+" focus",g.focusserId="focusser-"+g.generatedId,g.closeOnSelect=function(){return angular.isDefined(r.closeOnSelect)?l(r.closeOnSelect)():t.closeOnSelect}(),g.onSelectCallback=l(r.onSelect),g.onRemoveCallback=l(r.onRemove),g.limit=angular.isDefined(r.limit)?parseInt(r.limit,10):void 0,g.ngModel=f,g.choiceGrouped=function(e){return g.isGrouped&&e&&e.name},r.tabindex&&r.$observe("tabindex",function(e){g.focusInput.attr("tabindex",e),a.removeAttr("tabindex")}),c.$watch("searchEnabled",function(){var e=c.$eval(r.searchEnabled);g.searchEnabled=void 0!==e?e:t.searchEnabled}),c.$watch("sortable",function(){var e=c.$eval(r.sortable);g.sortable=void 0!==e?e:t.sortable}),r.$observe("disabled",function(){g.disabled=void 0!==r.disabled?r.disabled:!1}),r.$observe("resetSearchInput",function(){var e=c.$eval(r.resetSearchInput);g.resetSearchInput=void 0!==e?e:!0}),r.$observe("tagging",function(){if(void 0!==r.tagging){var e=c.$eval(r.tagging);g.tagging={isActivated:!0,fct:e!==!0?e:void 0}}else g.tagging={isActivated:!1,fct:void 0}}),r.$observe("taggingLabel",function(){void 0!==r.tagging&&(g.taggingLabel="false"===r.taggingLabel?!1:void 0!==r.taggingLabel?r.taggingLabel:"(new)")}),r.$observe("taggingTokens",function(){if(void 0!==r.tagging){var e=void 0!==r.taggingTokens?r.taggingTokens.split("|"):[",","ENTER"];g.taggingTokens={isActivated:!0,tokens:e}}}),angular.isDefined(r.autofocus)&&n(function(){g.setFocus()}),angular.isDefined(r.focusOn)&&c.$on(r.focusOn,function(){n(function(){g.setFocus()})}),e.on("click",d),c.$on("$destroy",function(){e.off("click",d)}),u(c,function(e){var t=angular.element("<div>").append(e),s=t.querySelectorAll(".ui-select-match");if(s.removeAttr("ui-select-match"),s.removeAttr("data-ui-select-match"),1!==s.length)throw i("transcluded","Expected 1 .ui-select-match but got '{0}'.",s.length);a.querySelectorAll(".ui-select-match").replaceWith(s);var c=t.querySelectorAll(".ui-select-choices");if(c.removeAttr("ui-select-choices"),c.removeAttr("data-ui-select-choices"),1!==c.length)throw i("transcluded","Expected 1 .ui-select-choices but got '{0}'.",c.length);a.querySelectorAll(".ui-select-choices").replaceWith(c)});var v=c.$eval(r.appendToBody);(void 0!==v?v:t.appendToBody)&&(c.$watch("$select.open",function(e){e?p():h()}),c.$on("$destroy",function(){h()}));var m=null,$="",b=null,w="direction-up";c.$watch("$select.open",function(){("auto"===g.dropdownPosition||"up"===g.dropdownPosition)&&c.calculateDropdownPos()});var x=function(e,t){e=e||s(a),t=t||s(b),b[0].style.position="absolute",b[0].style.top=-1*t.height+"px",a.addClass(w)},y=function(e,t){a.removeClass(w),e=e||s(a),t=t||s(b),b[0].style.position="",b[0].style.top=""};c.calculateDropdownPos=function(){if(g.open){if(b=angular.element(a).querySelectorAll(".ui-select-dropdown"),0===b.length)return;b[0].style.opacity=0,n(function(){if("up"===g.dropdownPosition)x(t,i);else{a.removeClass(w);var t=s(a),i=s(b),c=e[0].documentElement.scrollTop||e[0].body.scrollTop;t.top+t.height+i.height>c+e[0].documentElement.clientHeight?x(t,i):y(t,i)}b[0].style.opacity=1})}else{if(null===b||0===b.length)return;b[0].style.position="",b[0].style.top="",a.removeClass(w)}}}}}}]),i.directive("uiSelectMatch",["uiSelectConfig",function(e){return{restrict:"EA",require:"^uiSelect",replace:!0,transclude:!0,templateUrl:function(t){var i=t.parent().attr("theme")||e.theme,s=t.parent().attr("multiple");return i+(s?"/match-multiple.tpl.html":"/match.tpl.html")},link:function(t,i,s,c){function l(e){c.allowClear=angular.isDefined(e)?""===e?!0:"true"===e.toLowerCase():!1}c.lockChoiceExpression=s.uiLockChoice,s.$observe("placeholder",function(t){c.placeholder=void 0!==t?t:e.placeholder}),s.$observe("allowClear",l),l(s.allowClear),c.multiple&&c.sizeSearchInput()}}}]),i.directive("uiSelectMultiple",["uiSelectMinErr","$timeout",function(t,i){return{restrict:"EA",require:["^uiSelect","^ngModel"],controller:["$scope","$timeout",function(e,t){var i,s=this,c=e.$select;e.$evalAsync(function(){i=e.ngModel}),s.activeMatchIndex=-1,s.updateModel=function(){i.$setViewValue(Date.now()),s.refreshComponent()},s.refreshComponent=function(){c.refreshItems(),c.sizeSearchInput()},s.removeChoice=function(i){var l=c.selected[i];if(!l._uiSelectChoiceLocked){var n={};n[c.parserResult.itemName]=l,c.selected.splice(i,1),s.activeMatchIndex=-1,c.sizeSearchInput(),t(function(){c.onRemoveCallback(e,{$item:l,$model:c.parserResult.modelMapper(e,n)})}),s.updateModel()}},s.getPlaceholder=function(){return c.selected&&c.selected.length?void 0:c.placeholder}}],controllerAs:"$selectMultiple",link:function(s,c,l,n){function a(e){return angular.isNumber(e.selectionStart)?e.selectionStart:e.value.length}function r(t){function i(){switch(t){case e.LEFT:return~h.activeMatchIndex?u:n;case e.RIGHT:return~h.activeMatchIndex&&r!==n?o:(d.activate(),!1);case e.BACKSPACE:return~h.activeMatchIndex?(h.removeChoice(r),u):n;case e.DELETE:return~h.activeMatchIndex?(h.removeChoice(h.activeMatchIndex),r):!1}}var s=a(d.searchInput[0]),c=d.selected.length,l=0,n=c-1,r=h.activeMatchIndex,o=h.activeMatchIndex+1,u=h.activeMatchIndex-1,p=r;return s>0||d.search.length&&t==e.RIGHT?!1:(d.close(),p=i(),h.activeMatchIndex=d.selected.length&&p!==!1?Math.min(n,Math.max(l,p)):-1,!0)}function o(e){if(void 0===e||void 0===d.search)return!1;var t=e.filter(function(e){return void 0===d.search.toUpperCase()||void 0===e?!1:e.toUpperCase()===d.search.toUpperCase()}).length>0;return t}function u(e,t){var i=-1;if(angular.isArray(e))for(var s=angular.copy(e),c=0;c<s.length;c++)if(void 0===d.tagging.fct)s[c]+" "+d.taggingLabel===t&&(i=c);else{var l=s[c];l.isTag=!0,angular.equals(l,t)&&(i=c)}return i}var d=n[0],p=s.ngModel=n[1],h=s.$selectMultiple;d.multiple=!0,d.removeSelected=!0,d.focusInput=d.searchInput,p.$parsers.unshift(function(){for(var e,t={},i=[],c=d.selected.length-1;c>=0;c--)t={},t[d.parserResult.itemName]=d.selected[c],e=d.parserResult.modelMapper(s,t),i.unshift(e);return i}),p.$formatters.unshift(function(e){var t,i=d.parserResult.source(s,{$select:{search:""}}),c={};if(!i)return e;var l=[],n=function(e,i){if(e&&e.length){for(var n=e.length-1;n>=0;n--){if(c[d.parserResult.itemName]=e[n],t=d.parserResult.modelMapper(s,c),d.parserResult.trackByExp){var a=/\.(.+)/.exec(d.parserResult.trackByExp);if(a.length>0&&t[a[1]]==i[a[1]])return l.unshift(e[n]),!0}if(angular.equals(t,i))return l.unshift(e[n]),!0}return!1}};if(!e)return l;for(var a=e.length-1;a>=0;a--)n(d.selected,e[a])||n(i,e[a])||l.unshift(e[a]);return l}),s.$watchCollection(function(){return p.$modelValue},function(e,t){t!=e&&(p.$modelValue=null,h.refreshComponent())}),p.$render=function(){if(!angular.isArray(p.$viewValue)){if(!angular.isUndefined(p.$viewValue)&&null!==p.$viewValue)throw t("multiarr","Expected model value to be array but got '{0}'",p.$viewValue);d.selected=[]}d.selected=p.$viewValue,s.$evalAsync()},s.$on("uis:select",function(e,t){d.selected.length>=d.limit||(d.selected.push(t),h.updateModel())}),s.$on("uis:activate",function(){h.activeMatchIndex=-1}),s.$watch("$select.disabled",function(e,t){t&&!e&&d.sizeSearchInput()}),d.searchInput.on("keydown",function(t){var i=t.which;s.$apply(function(){var s=!1;e.isHorizontalMovement(i)&&(s=r(i)),s&&i!=e.TAB&&(t.preventDefault(),t.stopPropagation())})}),d.searchInput.on("keyup",function(t){if(e.isVerticalMovement(t.which)||s.$evalAsync(function(){d.activeIndex=d.taggingLabel===!1?-1:0}),d.tagging.isActivated&&d.search.length>0){if(t.which===e.TAB||e.isControl(t)||e.isFunctionKey(t)||t.which===e.ESC||e.isVerticalMovement(t.which))return;if(d.activeIndex=d.taggingLabel===!1?-1:0,d.taggingLabel===!1)return;var i,c,l,n,a=angular.copy(d.items),r=angular.copy(d.items),p=!1,h=-1;if(void 0!==d.tagging.fct){if(l=d.$filter("filter")(a,{isTag:!0}),l.length>0&&(n=l[0]),a.length>0&&n&&(p=!0,a=a.slice(1,a.length),r=r.slice(1,r.length)),i=d.tagging.fct(d.search),i.isTag=!0,r.filter(function(e){return angular.equals(e,d.tagging.fct(d.search))}).length>0)return;i.isTag=!0}else{if(l=d.$filter("filter")(a,function(e){return e.match(d.taggingLabel)}),l.length>0&&(n=l[0]),c=a[0],void 0!==c&&a.length>0&&n&&(p=!0,a=a.slice(1,a.length),r=r.slice(1,r.length)),i=d.search+" "+d.taggingLabel,u(d.selected,d.search)>-1)return;if(o(r.concat(d.selected)))return p&&(a=r,s.$evalAsync(function(){d.activeIndex=0,d.items=a})),void 0;if(o(r))return p&&(d.items=r.slice(1,r.length)),void 0}p&&(h=u(d.selected,i)),h>-1?a=a.slice(h+1,a.length-1):(a=[],a.push(i),a=a.concat(r)),s.$evalAsync(function(){d.activeIndex=0,d.items=a})}}),d.searchInput.on("blur",function(){i(function(){h.activeMatchIndex=-1})})}}}]),i.directive("uiSelectSingle",["$timeout","$compile",function(t,i){return{restrict:"EA",require:["^uiSelect","^ngModel"],link:function(s,c,l,n){var a=n[0],r=n[1];r.$parsers.unshift(function(e){var t,i={};return i[a.parserResult.itemName]=e,t=a.parserResult.modelMapper(s,i)}),r.$formatters.unshift(function(e){var t,i=a.parserResult.source(s,{$select:{search:""}}),c={};if(i){var l=function(i){return c[a.parserResult.itemName]=i,t=a.parserResult.modelMapper(s,c),t==e};if(a.selected&&l(a.selected))return a.selected;for(var n=i.length-1;n>=0;n--)if(l(i[n]))return i[n]}return e}),s.$watch("$select.selected",function(e){r.$viewValue!==e&&r.$setViewValue(e)}),r.$render=function(){a.selected=r.$viewValue},s.$on("uis:select",function(e,t){a.selected=t}),s.$on("uis:close",function(e,i){t(function(){a.focusser.prop("disabled",!1),i||a.focusser[0].focus()},0,!1)}),s.$on("uis:activate",function(){o.prop("disabled",!0)});var o=angular.element("<input ng-disabled='$select.disabled' class='ui-select-focusser ui-select-offscreen' type='text' id='{{ $select.focusserId }}' aria-label='{{ $select.focusserTitle }}' aria-haspopup='true' role='button' />");i(o)(s),a.focusser=o,a.focusInput=o,c.parent().append(o),o.bind("focus",function(){s.$evalAsync(function(){a.focus=!0})}),o.bind("blur",function(){s.$evalAsync(function(){a.focus=!1})}),o.bind("keydown",function(t){return t.which===e.BACKSPACE?(t.preventDefault(),t.stopPropagation(),a.select(void 0),s.$apply(),void 0):(t.which===e.TAB||e.isControl(t)||e.isFunctionKey(t)||t.which===e.ESC||((t.which==e.DOWN||t.which==e.UP||t.which==e.ENTER||t.which==e.SPACE)&&(t.preventDefault(),t.stopPropagation(),a.activate()),s.$digest()),void 0)}),o.bind("keyup input",function(t){t.which===e.TAB||e.isControl(t)||e.isFunctionKey(t)||t.which===e.ESC||t.which==e.ENTER||t.which===e.BACKSPACE||(a.activate(o.val()),o.val(""),s.$digest())})}}}]),i.directive("uiSelectSort",["$timeout","uiSelectConfig","uiSelectMinErr",function(e,t,i){return{require:"^uiSelect",link:function(t,s,c,l){if(null===t[c.uiSelectSort])throw i("sort","Expected a list to sort");var n=angular.extend({axis:"horizontal"},t.$eval(c.uiSelectSortOptions)),a=n.axis,r="dragging",o="dropping",u="dropping-before",d="dropping-after";t.$watch(function(){return l.sortable},function(e){e?s.attr("draggable",!0):s.removeAttr("draggable")}),s.on("dragstart",function(e){s.addClass(r),(e.dataTransfer||e.originalEvent.dataTransfer).setData("text/plain",t.$index)}),s.on("dragend",function(){s.removeClass(r)});var p,h=function(e,t){this.splice(t,0,this.splice(e,1)[0])},g=function(e){e.preventDefault();var t="vertical"===a?e.offsetY||e.layerY||(e.originalEvent?e.originalEvent.offsetY:0):e.offsetX||e.layerX||(e.originalEvent?e.originalEvent.offsetX:0);t<this["vertical"===a?"offsetHeight":"offsetWidth"]/2?(s.removeClass(d),s.addClass(u)):(s.removeClass(u),s.addClass(d))},f=function(t){t.preventDefault();var i=parseInt((t.dataTransfer||t.originalEvent.dataTransfer).getData("text/plain"),10);e.cancel(p),p=e(function(){v(i)},20)},v=function(e){var i=t.$eval(c.uiSelectSort),l=i[e],n=null;n=s.hasClass(u)?e<t.$index?t.$index-1:t.$index:e<t.$index?t.$index:t.$index+1,h.apply(i,[e,n]),t.$apply(function(){t.$emit("uiSelectSort:change",{array:i,item:l,from:e,to:n})}),s.removeClass(o),s.removeClass(u),s.removeClass(d),s.off("drop",f)};s.on("dragenter",function(){s.hasClass(r)||(s.addClass(o),s.on("dragover",g),s.on("drop",f))}),s.on("dragleave",function(e){e.target==s&&(s.removeClass(o),s.removeClass(u),s.removeClass(d),s.off("dragover",g),s.off("drop",f))})}}}]),i.service("uisRepeatParser",["uiSelectMinErr","$parse",function(e,t){var i=this;i.parse=function(i){var s,c=/\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)/.test(i);if(s=i.match(/^\s*(?:([\s\S]+?)\s+as\s+)?(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+(([\w\.]+)?\s*(|\s*[\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/),!s)throw e("iexp","Expected expression in form of '_item_ in _collection_[ track by _id_]' but got '{0}'.",i);if(!s[6]&&c)throw e("iexp","Expected expression in form of '_item_ as (_key_, _item_) in _ObjCollection_ [ track by _id_]' but got '{0}'.",i);return{itemName:s[4]||s[2],keyName:s[3],source:t(s[3]?s[6]:s[5]),sourceName:s[6],filters:s[7],trackByExp:s[8],modelMapper:t(s[1]||s[4]||s[2]),repeatExpression:function(e){var t=this.itemName+" in "+(e?"$group.items":"$select.items");return this.trackByExp&&(t+=" track by "+this.trackByExp),t}}},i.getGroupNgRepeatExpression=function(){return"$group in $select.groups"}}])}(),angular.module("ui.select").run(["$templateCache",function(e){e.put("bootstrap/choices.tpl.html",'<ul class="ui-select-choices ui-select-choices-content ui-select-dropdown dropdown-menu" role="listbox" ng-show="$select.items.length > 0"><li class="ui-select-choices-group" id="ui-select-choices-{{ $select.generatedId }}"><div class="divider" ng-show="$select.isGrouped && $index > 0"></div><div ng-show="$select.isGrouped" class="ui-select-choices-group-label dropdown-header" ng-bind="$group.name"></div><div id="ui-select-choices-row-{{ $select.generatedId }}-{{$index}}" class="ui-select-choices-row" ng-class="{active: $select.isActive(this), disabled: $select.isDisabled(this)}" role="option"><a href="javascript:void(0)" class="ui-select-choices-row-inner"></a></div></li></ul>'),e.put("bootstrap/match-multiple.tpl.html",'<span class="ui-select-match"><span ng-repeat="$item in $select.selected"><span class="ui-select-match-item btn btn-default btn-xs" tabindex="-1" type="button" ng-disabled="$select.disabled" ng-click="$selectMultiple.activeMatchIndex = $index;" ng-class="{\'btn-primary\':$selectMultiple.activeMatchIndex === $index, \'select-locked\':$select.isLocked(this, $index)}" ui-select-sort="$select.selected"><span class="close ui-select-match-close" ng-hide="$select.disabled" ng-click="$selectMultiple.removeChoice($index)">&nbsp;&times;</span> <span uis-transclude-append=""></span></span></span></span>'),e.put("bootstrap/match.tpl.html",'<div class="ui-select-match" ng-hide="$select.open" ng-disabled="$select.disabled" ng-class="{\'btn-default-focus\':$select.focus}"><span tabindex="-1" class="btn btn-default form-control ui-select-toggle" aria-label="{{ $select.baseTitle }} activate" ng-disabled="$select.disabled" ng-click="$select.activate()" style="outline: 0;"><span ng-show="$select.isEmpty()" class="ui-select-placeholder text-muted">{{$select.placeholder}}</span> <span ng-hide="$select.isEmpty()" class="ui-select-match-text pull-left" ng-class="{\'ui-select-allow-clear\': $select.allowClear && !$select.isEmpty()}" ng-transclude=""></span> <i class="caret pull-right" ng-click="$select.toggle($event)"></i> <a ng-show="$select.allowClear && !$select.isEmpty()" aria-label="{{ $select.baseTitle }} clear" style="margin-right: 10px" ng-click="$select.clear($event)" class="btn btn-xs btn-link pull-right"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i></a></span></div>'),e.put("bootstrap/select-multiple.tpl.html",'<div class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control" ng-class="{open: $select.open}"><div><div class="ui-select-match"></div><input type="text" autocomplete="false" autocorrect="off" autocapitalize="off" spellcheck="false" class="ui-select-search input-xs" placeholder="{{$selectMultiple.getPlaceholder()}}" ng-disabled="$select.disabled" ng-hide="$select.disabled" ng-click="$select.activate()" ng-model="$select.search" role="combobox" aria-label="{{ $select.baseTitle }}" ondrop="return false;"></div><div class="ui-select-choices"></div></div>'),e.put("bootstrap/select.tpl.html",'<div class="ui-select-container ui-select-bootstrap dropdown" ng-class="{open: $select.open}"><div class="ui-select-match"></div><input type="text" autocomplete="false" tabindex="-1" aria-expanded="true" aria-label="{{ $select.baseTitle }}" aria-owns="ui-select-choices-{{ $select.generatedId }}" aria-activedescendant="ui-select-choices-row-{{ $select.generatedId }}-{{ $select.activeIndex }}" class="form-control ui-select-search" placeholder="{{$select.placeholder}}" ng-model="$select.search" ng-show="$select.searchEnabled && $select.open"><div class="ui-select-choices"></div></div>'),e.put("selectize/choices.tpl.html",'<div ng-show="$select.open" class="ui-select-choices ui-select-dropdown selectize-dropdown single"><div class="ui-select-choices-content selectize-dropdown-content"><div class="ui-select-choices-group optgroup" role="listbox"><div ng-show="$select.isGrouped" class="ui-select-choices-group-label optgroup-header" ng-bind="$group.name"></div><div role="option" class="ui-select-choices-row" ng-class="{active: $select.isActive(this), disabled: $select.isDisabled(this)}"><div class="option ui-select-choices-row-inner" data-selectable=""></div></div></div></div></div>'),e.put("selectize/match.tpl.html",'<div ng-hide="($select.open || $select.isEmpty())" class="ui-select-match" ng-transclude=""></div>'),e.put("selectize/select.tpl.html",'<div class="ui-select-container selectize-control single" ng-class="{\'open\': $select.open}"><div class="selectize-input" ng-class="{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}" ng-click="$select.activate()"><div class="ui-select-match"></div><input type="text" autocomplete="false" tabindex="-1" class="ui-select-search ui-select-toggle" ng-click="$select.toggle($event)" placeholder="{{$select.placeholder}}" ng-model="$select.search" ng-hide="!$select.searchEnabled || ($select.selected && !$select.open)" ng-disabled="$select.disabled" aria-label="{{ $select.baseTitle }}"></div><div class="ui-select-choices"></div></div>'),e.put("select2/choices.tpl.html",'<ul class="ui-select-choices ui-select-choices-content select2-results"><li class="ui-select-choices-group" ng-class="{\'select2-result-with-children\': $select.choiceGrouped($group) }"><div ng-show="$select.choiceGrouped($group)" class="ui-select-choices-group-label select2-result-label" ng-bind="$group.name"></div><ul role="listbox" id="ui-select-choices-{{ $select.generatedId }}" ng-class="{\'select2-result-sub\': $select.choiceGrouped($group), \'select2-result-single\': !$select.choiceGrouped($group) }"><li role="option" id="ui-select-choices-row-{{ $select.generatedId }}-{{$index}}" class="ui-select-choices-row" ng-class="{\'select2-highlighted\': $select.isActive(this), \'select2-disabled\': $select.isDisabled(this)}"><div class="select2-result-label ui-select-choices-row-inner"></div></li></ul></li></ul>'),e.put("select2/match-multiple.tpl.html",'<span class="ui-select-match"><li class="ui-select-match-item select2-search-choice" ng-repeat="$item in $select.selected" ng-class="{\'select2-search-choice-focus\':$selectMultiple.activeMatchIndex === $index, \'select2-locked\':$select.isLocked(this, $index)}" ui-select-sort="$select.selected"><span uis-transclude-append=""></span> <a href="javascript:;" class="ui-select-match-close select2-search-choice-close" ng-click="$selectMultiple.removeChoice($index)" tabindex="-1"></a></li></span>'),e.put("select2/match.tpl.html",'<a class="select2-choice ui-select-match" ng-class="{\'select2-default\': $select.isEmpty()}" ng-click="$select.toggle($event)" aria-label="{{ $select.baseTitle }} select"><span ng-show="$select.isEmpty()" class="select2-chosen">{{$select.placeholder}}</span> <span ng-hide="$select.isEmpty()" class="select2-chosen" ng-transclude=""></span> <abbr ng-if="$select.allowClear && !$select.isEmpty()" class="select2-search-choice-close" ng-click="$select.clear($event)"></abbr> <span class="select2-arrow ui-select-toggle"><b></b></span></a>'),e.put("select2/select-multiple.tpl.html",'<div class="ui-select-container ui-select-multiple select2 select2-container select2-container-multi" ng-class="{\'select2-container-active select2-dropdown-open open\': $select.open, \'select2-container-disabled\': $select.disabled}"><ul class="select2-choices"><span class="ui-select-match"></span><li class="select2-search-field"><input type="text" autocomplete="false" autocorrect="off" autocapitalize="off" spellcheck="false" role="combobox" aria-expanded="true" aria-owns="ui-select-choices-{{ $select.generatedId }}" aria-label="{{ $select.baseTitle }}" aria-activedescendant="ui-select-choices-row-{{ $select.generatedId }}-{{ $select.activeIndex }}" class="select2-input ui-select-search" placeholder="{{$selectMultiple.getPlaceholder()}}" ng-disabled="$select.disabled" ng-hide="$select.disabled" ng-model="$select.search" ng-click="$select.activate()" style="width: 34px;" ondrop="return false;"></li></ul><div class="ui-select-dropdown select2-drop select2-with-searchbox select2-drop-active" ng-class="{\'select2-display-none\': !$select.open}"><div class="ui-select-choices"></div></div></div>'),e.put("select2/select.tpl.html",'<div class="ui-select-container select2 select2-container" ng-class="{\'select2-container-active select2-dropdown-open open\': $select.open, \'select2-container-disabled\': $select.disabled, \'select2-container-active\': $select.focus, \'select2-allowclear\': $select.allowClear && !$select.isEmpty()}"><div class="ui-select-match"></div><div class="ui-select-dropdown select2-drop select2-with-searchbox select2-drop-active" ng-class="{\'select2-display-none\': !$select.open}"><div class="select2-search" ng-show="$select.searchEnabled"><input type="text" autocomplete="false" autocorrect="false" autocapitalize="off" spellcheck="false" role="combobox" aria-expanded="true" aria-owns="ui-select-choices-{{ $select.generatedId }}" aria-label="{{ $select.baseTitle }}" aria-activedescendant="ui-select-choices-row-{{ $select.generatedId }}-{{ $select.activeIndex }}" class="ui-select-search select2-input" ng-model="$select.search"></div><div class="ui-select-choices"></div></div></div>')
 }]);
+/*
+ Leaflet.markercluster, Provides Beautiful Animated Marker Clustering functionality for Leaflet, a JS library for interactive maps.
+ https://github.com/Leaflet/Leaflet.markercluster
+ (c) 2012-2013, Dave Leaver, smartrak
+*/
+(function (window, document, undefined) {
+/*
+ * L.MarkerClusterGroup extends L.FeatureGroup by clustering the markers contained within
+ */
+
+L.MarkerClusterGroup = L.FeatureGroup.extend({
+
+	options: {
+		maxClusterRadius: 80, //A cluster will cover at most this many pixels from its center
+		iconCreateFunction: null,
+
+		spiderfyOnMaxZoom: true,
+		showCoverageOnHover: true,
+		zoomToBoundsOnClick: true,
+		singleMarkerMode: false,
+
+		disableClusteringAtZoom: null,
+
+		// Setting this to false prevents the removal of any clusters outside of the viewpoint, which
+		// is the default behaviour for performance reasons.
+		removeOutsideVisibleBounds: true,
+
+		//Whether to animate adding markers after adding the MarkerClusterGroup to the map
+		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
+		animateAddingMarkers: false,
+
+		//Increase to increase the distance away that spiderfied markers appear from the center
+		spiderfyDistanceMultiplier: 1,
+
+		//Options to pass to the L.Polygon constructor
+		polygonOptions: {}
+	},
+
+	initialize: function (options) {
+		L.Util.setOptions(this, options);
+		if (!this.options.iconCreateFunction) {
+			this.options.iconCreateFunction = this._defaultIconCreateFunction;
+		}
+
+		this._featureGroup = L.featureGroup();
+		this._featureGroup.on(L.FeatureGroup.EVENTS, this._propagateEvent, this);
+
+		this._nonPointGroup = L.featureGroup();
+		this._nonPointGroup.on(L.FeatureGroup.EVENTS, this._propagateEvent, this);
+
+		this._inZoomAnimation = 0;
+		this._needsClustering = [];
+		this._needsRemoving = []; //Markers removed while we aren't on the map need to be kept track of
+		//The bounds of the currently shown area (from _getExpandedVisibleBounds) Updated on zoom/move
+		this._currentShownBounds = null;
+
+		this._queue = [];
+	},
+
+	addLayer: function (layer) {
+
+		if (layer instanceof L.LayerGroup) {
+			var array = [];
+			for (var i in layer._layers) {
+				array.push(layer._layers[i]);
+			}
+			return this.addLayers(array);
+		}
+
+		//Don't cluster non point data
+		if (!layer.getLatLng) {
+			this._nonPointGroup.addLayer(layer);
+			return this;
+		}
+
+		if (!this._map) {
+			this._needsClustering.push(layer);
+			return this;
+		}
+
+		if (this.hasLayer(layer)) {
+			return this;
+		}
+
+
+		//If we have already clustered we'll need to add this one to a cluster
+
+		if (this._unspiderfy) {
+			this._unspiderfy();
+		}
+
+		this._addLayer(layer, this._maxZoom);
+
+		//Work out what is visible
+		var visibleLayer = layer,
+			currentZoom = this._map.getZoom();
+		if (layer.__parent) {
+			while (visibleLayer.__parent._zoom >= currentZoom) {
+				visibleLayer = visibleLayer.__parent;
+			}
+		}
+
+		if (this._currentShownBounds.contains(visibleLayer.getLatLng())) {
+			if (this.options.animateAddingMarkers) {
+				this._animationAddLayer(layer, visibleLayer);
+			} else {
+				this._animationAddLayerNonAnimated(layer, visibleLayer);
+			}
+		}
+		return this;
+	},
+
+	removeLayer: function (layer) {
+
+		if (layer instanceof L.LayerGroup)
+		{
+			var array = [];
+			for (var i in layer._layers) {
+				array.push(layer._layers[i]);
+			}
+			return this.removeLayers(array);
+		}
+
+		//Non point layers
+		if (!layer.getLatLng) {
+			this._nonPointGroup.removeLayer(layer);
+			return this;
+		}
+
+		if (!this._map) {
+			if (!this._arraySplice(this._needsClustering, layer) && this.hasLayer(layer)) {
+				this._needsRemoving.push(layer);
+			}
+			return this;
+		}
+
+		if (!layer.__parent) {
+			return this;
+		}
+
+		if (this._unspiderfy) {
+			this._unspiderfy();
+			this._unspiderfyLayer(layer);
+		}
+
+		//Remove the marker from clusters
+		this._removeLayer(layer, true);
+
+		if (this._featureGroup.hasLayer(layer)) {
+			this._featureGroup.removeLayer(layer);
+			if (layer.setOpacity) {
+				layer.setOpacity(1);
+			}
+		}
+
+		return this;
+	},
+
+	//Takes an array of markers and adds them in bulk
+	addLayers: function (layersArray) {
+		var i, l, m,
+			onMap = this._map,
+			fg = this._featureGroup,
+			npg = this._nonPointGroup;
+
+		for (i = 0, l = layersArray.length; i < l; i++) {
+			m = layersArray[i];
+
+			//Not point data, can't be clustered
+			if (!m.getLatLng) {
+				npg.addLayer(m);
+				continue;
+			}
+
+			if (this.hasLayer(m)) {
+				continue;
+			}
+
+			if (!onMap) {
+				this._needsClustering.push(m);
+				continue;
+			}
+
+			this._addLayer(m, this._maxZoom);
+
+			//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
+			if (m.__parent) {
+				if (m.__parent.getChildCount() === 2) {
+					var markers = m.__parent.getAllChildMarkers(),
+						otherMarker = markers[0] === m ? markers[1] : markers[0];
+					fg.removeLayer(otherMarker);
+				}
+			}
+		}
+
+		if (onMap) {
+			//Update the icons of all those visible clusters that were affected
+			fg.eachLayer(function (c) {
+				if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
+					c._updateIcon();
+				}
+			});
+
+			this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+		}
+
+		return this;
+	},
+
+	//Takes an array of markers and removes them in bulk
+	removeLayers: function (layersArray) {
+		var i, l, m,
+			fg = this._featureGroup,
+			npg = this._nonPointGroup;
+
+		if (!this._map) {
+			for (i = 0, l = layersArray.length; i < l; i++) {
+				m = layersArray[i];
+				this._arraySplice(this._needsClustering, m);
+				npg.removeLayer(m);
+			}
+			return this;
+		}
+
+		for (i = 0, l = layersArray.length; i < l; i++) {
+			m = layersArray[i];
+
+			if (!m.__parent) {
+				npg.removeLayer(m);
+				continue;
+			}
+
+			this._removeLayer(m, true, true);
+
+			if (fg.hasLayer(m)) {
+				fg.removeLayer(m);
+				if (m.setOpacity) {
+					m.setOpacity(1);
+				}
+			}
+		}
+
+		//Fix up the clusters and markers on the map
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+
+		fg.eachLayer(function (c) {
+			if (c instanceof L.MarkerCluster) {
+				c._updateIcon();
+			}
+		});
+
+		return this;
+	},
+
+	//Removes all layers from the MarkerClusterGroup
+	clearLayers: function () {
+		//Need our own special implementation as the LayerGroup one doesn't work for us
+
+		//If we aren't on the map (yet), blow away the markers we know of
+		if (!this._map) {
+			this._needsClustering = [];
+			delete this._gridClusters;
+			delete this._gridUnclustered;
+		}
+
+		if (this._noanimationUnspiderfy) {
+			this._noanimationUnspiderfy();
+		}
+
+		//Remove all the visible layers
+		this._featureGroup.clearLayers();
+		this._nonPointGroup.clearLayers();
+
+		this.eachLayer(function (marker) {
+			delete marker.__parent;
+		});
+
+		if (this._map) {
+			//Reset _topClusterLevel and the DistanceGrids
+			this._generateInitialClusters();
+		}
+
+		return this;
+	},
+
+	//Override FeatureGroup.getBounds as it doesn't work
+	getBounds: function () {
+		var bounds = new L.LatLngBounds();
+		if (this._topClusterLevel) {
+			bounds.extend(this._topClusterLevel._bounds);
+		} else {
+			for (var i = this._needsClustering.length - 1; i >= 0; i--) {
+				bounds.extend(this._needsClustering[i].getLatLng());
+			}
+		}
+
+		bounds.extend(this._nonPointGroup.getBounds());
+
+		return bounds;
+	},
+
+	//Overrides LayerGroup.eachLayer
+	eachLayer: function (method, context) {
+		var markers = this._needsClustering.slice(),
+		    i;
+
+		if (this._topClusterLevel) {
+			this._topClusterLevel.getAllChildMarkers(markers);
+		}
+
+		for (i = markers.length - 1; i >= 0; i--) {
+			method.call(context, markers[i]);
+		}
+
+		this._nonPointGroup.eachLayer(method, context);
+	},
+
+	//Overrides LayerGroup.getLayers
+	getLayers: function () {
+		var layers = [];
+		this.eachLayer(function (l) {
+			layers.push(l);
+		});
+		return layers;
+	},
+
+	//Overrides LayerGroup.getLayer, WARNING: Really bad performance
+	getLayer: function (id) {
+		var result = null;
+
+		this.eachLayer(function (l) {
+			if (L.stamp(l) === id) {
+				result = l;
+			}
+		});
+
+		return result;
+	},
+
+	//Returns true if the given layer is in this MarkerClusterGroup
+	hasLayer: function (layer) {
+		if (!layer) {
+			return false;
+		}
+
+		var i, anArray = this._needsClustering;
+
+		for (i = anArray.length - 1; i >= 0; i--) {
+			if (anArray[i] === layer) {
+				return true;
+			}
+		}
+
+		anArray = this._needsRemoving;
+		for (i = anArray.length - 1; i >= 0; i--) {
+			if (anArray[i] === layer) {
+				return false;
+			}
+		}
+
+		return !!(layer.__parent && layer.__parent._group === this) || this._nonPointGroup.hasLayer(layer);
+	},
+
+	//Zoom down to show the given layer (spiderfying if necessary) then calls the callback
+	zoomToShowLayer: function (layer, callback) {
+
+		var showMarker = function () {
+			if ((layer._icon || layer.__parent._icon) && !this._inZoomAnimation) {
+				this._map.off('moveend', showMarker, this);
+				this.off('animationend', showMarker, this);
+
+				if (layer._icon) {
+					callback();
+				} else if (layer.__parent._icon) {
+					var afterSpiderfy = function () {
+						this.off('spiderfied', afterSpiderfy, this);
+						callback();
+					};
+
+					this.on('spiderfied', afterSpiderfy, this);
+					layer.__parent.spiderfy();
+				}
+			}
+		};
+
+		if (layer._icon && this._map.getBounds().contains(layer.getLatLng())) {
+			callback();
+		} else if (layer.__parent._zoom < this._map.getZoom()) {
+			//Layer should be visible now but isn't on screen, just pan over to it
+			this._map.on('moveend', showMarker, this);
+			this._map.panTo(layer.getLatLng());
+		} else {
+			this._map.on('moveend', showMarker, this);
+			this.on('animationend', showMarker, this);
+			this._map.setView(layer.getLatLng(), layer.__parent._zoom + 1);
+			layer.__parent.zoomToBounds();
+		}
+	},
+
+	//Overrides FeatureGroup.onAdd
+	onAdd: function (map) {
+		this._map = map;
+		var i, l, layer;
+
+		if (!isFinite(this._map.getMaxZoom())) {
+			throw "Map has no maxZoom specified";
+		}
+
+		this._featureGroup.onAdd(map);
+		this._nonPointGroup.onAdd(map);
+
+		if (!this._gridClusters) {
+			this._generateInitialClusters();
+		}
+
+		for (i = 0, l = this._needsRemoving.length; i < l; i++) {
+			layer = this._needsRemoving[i];
+			this._removeLayer(layer, true);
+		}
+		this._needsRemoving = [];
+
+		for (i = 0, l = this._needsClustering.length; i < l; i++) {
+			layer = this._needsClustering[i];
+
+			//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
+			if (!layer.getLatLng) {
+				this._featureGroup.addLayer(layer);
+				continue;
+			}
+
+
+			if (layer.__parent) {
+				continue;
+			}
+			this._addLayer(layer, this._maxZoom);
+		}
+		this._needsClustering = [];
+
+
+		this._map.on('zoomend', this._zoomEnd, this);
+		this._map.on('moveend', this._moveEnd, this);
+
+		if (this._spiderfierOnAdd) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
+			this._spiderfierOnAdd();
+		}
+
+		this._bindEvents();
+
+
+		//Actually add our markers to the map:
+
+		//Remember the current zoom level and bounds
+		this._zoom = this._map.getZoom();
+		this._currentShownBounds = this._getExpandedVisibleBounds();
+
+		//Make things appear on the map
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+	},
+
+	//Overrides FeatureGroup.onRemove
+	onRemove: function (map) {
+		map.off('zoomend', this._zoomEnd, this);
+		map.off('moveend', this._moveEnd, this);
+
+		this._unbindEvents();
+
+		//In case we are in a cluster animation
+		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
+
+		if (this._spiderfierOnRemove) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
+			this._spiderfierOnRemove();
+		}
+
+
+
+		//Clean up all the layers we added to the map
+		this._hideCoverage();
+		this._featureGroup.onRemove(map);
+		this._nonPointGroup.onRemove(map);
+
+		this._featureGroup.clearLayers();
+
+		this._map = null;
+	},
+
+	getVisibleParent: function (marker) {
+		var vMarker = marker;
+		while (vMarker && !vMarker._icon) {
+			vMarker = vMarker.__parent;
+		}
+		return vMarker || null;
+	},
+
+	//Remove the given object from the given array
+	_arraySplice: function (anArray, obj) {
+		for (var i = anArray.length - 1; i >= 0; i--) {
+			if (anArray[i] === obj) {
+				anArray.splice(i, 1);
+				return true;
+			}
+		}
+	},
+
+	//Internal function for removing a marker from everything.
+	//dontUpdateMap: set to true if you will handle updating the map manually (for bulk functions)
+	_removeLayer: function (marker, removeFromDistanceGrid, dontUpdateMap) {
+		var gridClusters = this._gridClusters,
+			gridUnclustered = this._gridUnclustered,
+			fg = this._featureGroup,
+			map = this._map;
+
+		//Remove the marker from distance clusters it might be in
+		if (removeFromDistanceGrid) {
+			for (var z = this._maxZoom; z >= 0; z--) {
+				if (!gridUnclustered[z].removeObject(marker, map.project(marker.getLatLng(), z))) {
+					break;
+				}
+			}
+		}
+
+		//Work our way up the clusters removing them as we go if required
+		var cluster = marker.__parent,
+			markers = cluster._markers,
+			otherMarker;
+
+		//Remove the marker from the immediate parents marker list
+		this._arraySplice(markers, marker);
+
+		while (cluster) {
+			cluster._childCount--;
+
+			if (cluster._zoom < 0) {
+				//Top level, do nothing
+				break;
+			} else if (removeFromDistanceGrid && cluster._childCount <= 1) { //Cluster no longer required
+				//We need to push the other marker up to the parent
+				otherMarker = cluster._markers[0] === marker ? cluster._markers[1] : cluster._markers[0];
+
+				//Update distance grid
+				gridClusters[cluster._zoom].removeObject(cluster, map.project(cluster._cLatLng, cluster._zoom));
+				gridUnclustered[cluster._zoom].addObject(otherMarker, map.project(otherMarker.getLatLng(), cluster._zoom));
+
+				//Move otherMarker up to parent
+				this._arraySplice(cluster.__parent._childClusters, cluster);
+				cluster.__parent._markers.push(otherMarker);
+				otherMarker.__parent = cluster.__parent;
+
+				if (cluster._icon) {
+					//Cluster is currently on the map, need to put the marker on the map instead
+					fg.removeLayer(cluster);
+					if (!dontUpdateMap) {
+						fg.addLayer(otherMarker);
+					}
+				}
+			} else {
+				cluster._recalculateBounds();
+				if (!dontUpdateMap || !cluster._icon) {
+					cluster._updateIcon();
+				}
+			}
+
+			cluster = cluster.__parent;
+		}
+
+		delete marker.__parent;
+	},
+
+	_isOrIsParent: function (el, oel) {
+		while (oel) {
+			if (el === oel) {
+				return true;
+			}
+			oel = oel.parentNode;
+		}
+		return false;
+	},
+
+	_propagateEvent: function (e) {
+		if (e.layer instanceof L.MarkerCluster) {
+			//Prevent multiple clustermouseover/off events if the icon is made up of stacked divs (Doesn't work in ie <= 8, no relatedTarget)
+			if (e.originalEvent && this._isOrIsParent(e.layer._icon, e.originalEvent.relatedTarget)) {
+				return;
+			}
+			e.type = 'cluster' + e.type;
+		}
+
+		this.fire(e.type, e);
+	},
+
+	//Default functionality
+	_defaultIconCreateFunction: function (cluster) {
+		var childCount = cluster.getChildCount();
+
+		var c = ' marker-cluster-';
+		if (childCount < 10) {
+			c += 'small';
+		} else if (childCount < 100) {
+			c += 'medium';
+		} else {
+			c += 'large';
+		}
+
+		return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+	},
+
+	_bindEvents: function () {
+		var map = this._map,
+		    spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
+		    showCoverageOnHover = this.options.showCoverageOnHover,
+		    zoomToBoundsOnClick = this.options.zoomToBoundsOnClick;
+
+		//Zoom on cluster click or spiderfy if we are at the lowest level
+		if (spiderfyOnMaxZoom || zoomToBoundsOnClick) {
+			this.on('clusterclick', this._zoomOrSpiderfy, this);
+		}
+
+		//Show convex hull (boundary) polygon on mouse over
+		if (showCoverageOnHover) {
+			this.on('clustermouseover', this._showCoverage, this);
+			this.on('clustermouseout', this._hideCoverage, this);
+			map.on('zoomend', this._hideCoverage, this);
+		}
+	},
+
+	_zoomOrSpiderfy: function (e) {
+		var map = this._map;
+		if (true) {//map.getMaxZoom() === map.getZoom()) {
+			if (this.options.spiderfyOnMaxZoom) {
+				e.layer.spiderfy();
+			}
+		} else if (this.options.zoomToBoundsOnClick) {
+			e.layer.zoomToBounds();
+		}
+
+    // Focus the map again for keyboard users.
+		if (e.originalEvent && e.originalEvent.keyCode === 13) {
+			map._container.focus();
+		}
+	},
+
+	_showCoverage: function (e) {
+		var map = this._map;
+		if (this._inZoomAnimation) {
+			return;
+		}
+		if (this._shownPolygon) {
+			map.removeLayer(this._shownPolygon);
+		}
+		if (e.layer.getChildCount() > 2 && e.layer !== this._spiderfied) {
+			this._shownPolygon = new L.Polygon(e.layer.getConvexHull(), this.options.polygonOptions);
+			map.addLayer(this._shownPolygon);
+		}
+	},
+
+	_hideCoverage: function () {
+		if (this._shownPolygon) {
+			this._map.removeLayer(this._shownPolygon);
+			this._shownPolygon = null;
+		}
+	},
+
+	_unbindEvents: function () {
+		var spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
+			showCoverageOnHover = this.options.showCoverageOnHover,
+			zoomToBoundsOnClick = this.options.zoomToBoundsOnClick,
+			map = this._map;
+
+		if (spiderfyOnMaxZoom || zoomToBoundsOnClick) {
+			this.off('clusterclick', this._zoomOrSpiderfy, this);
+		}
+		if (showCoverageOnHover) {
+			this.off('clustermouseover', this._showCoverage, this);
+			this.off('clustermouseout', this._hideCoverage, this);
+			map.off('zoomend', this._hideCoverage, this);
+		}
+	},
+
+	_zoomEnd: function () {
+		if (!this._map) { //May have been removed from the map by a zoomEnd handler
+			return;
+		}
+		this._mergeSplitClusters();
+
+		this._zoom = this._map._zoom;
+		this._currentShownBounds = this._getExpandedVisibleBounds();
+	},
+
+	_moveEnd: function () {
+		if (this._inZoomAnimation) {
+			return;
+		}
+
+		var newBounds = this._getExpandedVisibleBounds();
+
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom, newBounds);
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._map._zoom, newBounds);
+
+		this._currentShownBounds = newBounds;
+		return;
+	},
+
+	_generateInitialClusters: function () {
+		var maxZoom = this._map.getMaxZoom(),
+			radius = this.options.maxClusterRadius;
+
+		if (this.options.disableClusteringAtZoom) {
+			maxZoom = this.options.disableClusteringAtZoom - 1;
+		}
+		this._maxZoom = maxZoom;
+		this._gridClusters = {};
+		this._gridUnclustered = {};
+
+		//Set up DistanceGrids for each zoom
+		for (var zoom = maxZoom; zoom >= 0; zoom--) {
+			this._gridClusters[zoom] = new L.DistanceGrid(radius);
+			this._gridUnclustered[zoom] = new L.DistanceGrid(radius);
+		}
+
+		this._topClusterLevel = new L.MarkerCluster(this, -1);
+	},
+
+	//Zoom: Zoom to start adding at (Pass this._maxZoom to start at the bottom)
+	_addLayer: function (layer, zoom) {
+		var gridClusters = this._gridClusters,
+		    gridUnclustered = this._gridUnclustered,
+		    markerPoint, z;
+
+		if (this.options.singleMarkerMode) {
+			layer.options.icon = this.options.iconCreateFunction({
+				getChildCount: function () {
+					return 1;
+				},
+				getAllChildMarkers: function () {
+					return [layer];
+				}
+			});
+		}
+
+		//Find the lowest zoom level to slot this one in
+		for (; zoom >= 0; zoom--) {
+			markerPoint = this._map.project(layer.getLatLng(), zoom); // calculate pixel position
+
+			//Try find a cluster close by
+			var closest = gridClusters[zoom].getNearObject(markerPoint);
+			if (closest) {
+				closest._addChild(layer);
+				layer.__parent = closest;
+				return;
+			}
+
+			//Try find a marker close by to form a new cluster with
+			closest = gridUnclustered[zoom].getNearObject(markerPoint);
+			if (closest) {
+				var parent = closest.__parent;
+				if (parent) {
+					this._removeLayer(closest, false);
+				}
+
+				//Create new cluster with these 2 in it
+
+				var newCluster = new L.MarkerCluster(this, zoom, closest, layer);
+				gridClusters[zoom].addObject(newCluster, this._map.project(newCluster._cLatLng, zoom));
+				closest.__parent = newCluster;
+				layer.__parent = newCluster;
+
+				//First create any new intermediate parent clusters that don't exist
+				var lastParent = newCluster;
+				for (z = zoom - 1; z > parent._zoom; z--) {
+					lastParent = new L.MarkerCluster(this, z, lastParent);
+					gridClusters[z].addObject(lastParent, this._map.project(closest.getLatLng(), z));
+				}
+				parent._addChild(lastParent);
+
+				//Remove closest from this zoom level and any above that it is in, replace with newCluster
+				for (z = zoom; z >= 0; z--) {
+					if (!gridUnclustered[z].removeObject(closest, this._map.project(closest.getLatLng(), z))) {
+						break;
+					}
+				}
+
+				return;
+			}
+
+			//Didn't manage to cluster in at this zoom, record us as a marker here and continue upwards
+			gridUnclustered[zoom].addObject(layer, markerPoint);
+		}
+
+		//Didn't get in anything, add us to the top
+		this._topClusterLevel._addChild(layer);
+		layer.__parent = this._topClusterLevel;
+		return;
+	},
+
+	//Enqueue code to fire after the marker expand/contract has happened
+	_enqueue: function (fn) {
+		this._queue.push(fn);
+		if (!this._queueTimeout) {
+			this._queueTimeout = setTimeout(L.bind(this._processQueue, this), 300);
+		}
+	},
+	_processQueue: function () {
+		for (var i = 0; i < this._queue.length; i++) {
+			this._queue[i].call(this);
+		}
+		this._queue.length = 0;
+		clearTimeout(this._queueTimeout);
+		this._queueTimeout = null;
+	},
+
+	//Merge and split any existing clusters that are too big or small
+	_mergeSplitClusters: function () {
+
+		//Incase we are starting to split before the animation finished
+		this._processQueue();
+
+		if (this._zoom < this._map._zoom && this._currentShownBounds.contains(this._getExpandedVisibleBounds())) { //Zoom in, split
+			this._animationStart();
+			//Remove clusters now off screen
+			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom, this._getExpandedVisibleBounds());
+
+			this._animationZoomIn(this._zoom, this._map._zoom);
+
+		} else if (this._zoom > this._map._zoom) { //Zoom out, merge
+			this._animationStart();
+
+			this._animationZoomOut(this._zoom, this._map._zoom);
+		} else {
+			this._moveEnd();
+		}
+	},
+
+	//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
+	_getExpandedVisibleBounds: function () {
+		if (!this.options.removeOutsideVisibleBounds) {
+			return this.getBounds();
+		}
+
+		var map = this._map,
+			bounds = map.getBounds(),
+			sw = bounds._southWest,
+			ne = bounds._northEast,
+			latDiff = L.Browser.mobile ? 0 : Math.abs(sw.lat - ne.lat),
+			lngDiff = L.Browser.mobile ? 0 : Math.abs(sw.lng - ne.lng);
+
+		return new L.LatLngBounds(
+			new L.LatLng(sw.lat - latDiff, sw.lng - lngDiff, true),
+			new L.LatLng(ne.lat + latDiff, ne.lng + lngDiff, true));
+	},
+
+	//Shared animation code
+	_animationAddLayerNonAnimated: function (layer, newCluster) {
+		if (newCluster === layer) {
+			this._featureGroup.addLayer(layer);
+		} else if (newCluster._childCount === 2) {
+			newCluster._addToMap();
+
+			var markers = newCluster.getAllChildMarkers();
+			this._featureGroup.removeLayer(markers[0]);
+			this._featureGroup.removeLayer(markers[1]);
+		} else {
+			newCluster._updateIcon();
+		}
+	}
+});
+
+L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
+
+	//Non Animated versions of everything
+	_animationStart: function () {
+		//Do nothing...
+	},
+	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+	},
+	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+	},
+	_animationAddLayer: function (layer, newCluster) {
+		this._animationAddLayerNonAnimated(layer, newCluster);
+	}
+} : {
+
+	//Animated versions here
+	_animationStart: function () {
+		this._map._mapPane.className += ' leaflet-cluster-anim';
+		this._inZoomAnimation++;
+	},
+	_animationEnd: function () {
+		if (this._map) {
+			this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
+		}
+		this._inZoomAnimation--;
+		this.fire('animationend');
+	},
+	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
+		var bounds = this._getExpandedVisibleBounds(),
+		    fg = this._featureGroup,
+		    i;
+
+		//Add all children of current clusters to map and remove those clusters from map
+		this._topClusterLevel._recursively(bounds, previousZoomLevel, 0, function (c) {
+			var startPos = c._latlng,
+				markers = c._markers,
+				m;
+
+			if (!bounds.contains(startPos)) {
+				startPos = null;
+			}
+
+			if (c._isSingleParent() && previousZoomLevel + 1 === newZoomLevel) { //Immediately add the new child and remove us
+				fg.removeLayer(c);
+				c._recursivelyAddChildrenToMap(null, newZoomLevel, bounds);
+			} else {
+				//Fade out old cluster
+				c.setOpacity(0);
+				c._recursivelyAddChildrenToMap(startPos, newZoomLevel, bounds);
+			}
+
+			//Remove all markers that aren't visible any more
+			//TODO: Do we actually need to do this on the higher levels too?
+			for (i = markers.length - 1; i >= 0; i--) {
+				m = markers[i];
+				if (!bounds.contains(m._latlng)) {
+					fg.removeLayer(m);
+				}
+			}
+
+		});
+
+		this._forceLayout();
+
+		//Update opacities
+		this._topClusterLevel._recursivelyBecomeVisible(bounds, newZoomLevel);
+		//TODO Maybe? Update markers in _recursivelyBecomeVisible
+		fg.eachLayer(function (n) {
+			if (!(n instanceof L.MarkerCluster) && n._icon) {
+				n.setOpacity(1);
+			}
+		});
+
+		//update the positions of the just added clusters/markers
+		this._topClusterLevel._recursively(bounds, previousZoomLevel, newZoomLevel, function (c) {
+			c._recursivelyRestoreChildPositions(newZoomLevel);
+		});
+
+		//Remove the old clusters and close the zoom animation
+		this._enqueue(function () {
+			//update the positions of the just added clusters/markers
+			this._topClusterLevel._recursively(bounds, previousZoomLevel, 0, function (c) {
+				fg.removeLayer(c);
+				c.setOpacity(1);
+			});
+
+			this._animationEnd();
+		});
+	},
+
+	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
+		this._animationZoomOutSingle(this._topClusterLevel, previousZoomLevel - 1, newZoomLevel);
+
+		//Need to add markers for those that weren't on the map before but are now
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+		//Remove markers that were on the map before but won't be now
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel, this._getExpandedVisibleBounds());
+	},
+	_animationZoomOutSingle: function (cluster, previousZoomLevel, newZoomLevel) {
+		var bounds = this._getExpandedVisibleBounds();
+
+		//Animate all of the markers in the clusters to move to their cluster center point
+		cluster._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, previousZoomLevel + 1, newZoomLevel);
+
+		var me = this;
+
+		//Update the opacity (If we immediately set it they won't animate)
+		this._forceLayout();
+		cluster._recursivelyBecomeVisible(bounds, newZoomLevel);
+
+		//TODO: Maybe use the transition timing stuff to make this more reliable
+		//When the animations are done, tidy up
+		this._enqueue(function () {
+
+			//This cluster stopped being a cluster before the timeout fired
+			if (cluster._childCount === 1) {
+				var m = cluster._markers[0];
+				//If we were in a cluster animation at the time then the opacity and position of our child could be wrong now, so fix it
+				m.setLatLng(m.getLatLng());
+				m.setOpacity(1);
+			} else {
+				cluster._recursively(bounds, newZoomLevel, 0, function (c) {
+					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel + 1);
+				});
+			}
+			me._animationEnd();
+		});
+	},
+	_animationAddLayer: function (layer, newCluster) {
+		var me = this,
+			fg = this._featureGroup;
+
+		fg.addLayer(layer);
+		if (newCluster !== layer) {
+			if (newCluster._childCount > 2) { //Was already a cluster
+
+				newCluster._updateIcon();
+				this._forceLayout();
+				this._animationStart();
+
+				layer._setPos(this._map.latLngToLayerPoint(newCluster.getLatLng()));
+				layer.setOpacity(0);
+
+				this._enqueue(function () {
+					fg.removeLayer(layer);
+					layer.setOpacity(1);
+
+					me._animationEnd();
+				});
+
+			} else { //Just became a cluster
+				this._forceLayout();
+
+				me._animationStart();
+				me._animationZoomOutSingle(newCluster, this._map.getMaxZoom(), this._map.getZoom());
+			}
+		}
+	},
+
+	//Force a browser layout of stuff in the map
+	// Should apply the current opacity and location to all elements so we can update them again for an animation
+	_forceLayout: function () {
+		//In my testing this works, infact offsetWidth of any element seems to work.
+		//Could loop all this._layers and do this for each _icon if it stops working
+
+		L.Util.falseFn(document.body.offsetWidth);
+	}
+});
+
+L.markerClusterGroup = function (options) {
+	return new L.MarkerClusterGroup(options);
+};
+
+
+L.MarkerCluster = L.Marker.extend({
+	initialize: function (group, zoom, a, b) {
+
+		L.Marker.prototype.initialize.call(this, a ? (a._cLatLng || a.getLatLng()) : new L.LatLng(0, 0), { icon: this });
+
+
+		this._group = group;
+		this._zoom = zoom;
+
+		this._markers = [];
+		this._childClusters = [];
+		this._childCount = 0;
+		this._iconNeedsUpdate = true;
+
+		this._bounds = new L.LatLngBounds();
+
+		if (a) {
+			this._addChild(a);
+		}
+		if (b) {
+			this._addChild(b);
+		}
+	},
+
+	//Recursively retrieve all child markers of this cluster
+	getAllChildMarkers: function (storageArray) {
+		storageArray = storageArray || [];
+
+		for (var i = this._childClusters.length - 1; i >= 0; i--) {
+			this._childClusters[i].getAllChildMarkers(storageArray);
+		}
+
+		for (var j = this._markers.length - 1; j >= 0; j--) {
+			storageArray.push(this._markers[j]);
+		}
+
+		return storageArray;
+	},
+
+	//Returns the count of how many child markers we have
+	getChildCount: function () {
+		return this._childCount;
+	},
+
+	//Zoom to the minimum of showing all of the child markers, or the extents of this cluster
+	zoomToBounds: function () {
+		var childClusters = this._childClusters.slice(),
+			map = this._group._map,
+			boundsZoom = map.getBoundsZoom(this._bounds),
+			zoom = this._zoom + 1,
+			mapZoom = map.getZoom(),
+			i;
+
+		//calculate how fare we need to zoom down to see all of the markers
+		while (childClusters.length > 0 && boundsZoom > zoom) {
+			zoom++;
+			var newClusters = [];
+			for (i = 0; i < childClusters.length; i++) {
+				newClusters = newClusters.concat(childClusters[i]._childClusters);
+			}
+			childClusters = newClusters;
+		}
+
+		if (boundsZoom > zoom) {
+			this._group._map.setView(this._latlng, zoom);
+		} else if (boundsZoom <= mapZoom) { //If fitBounds wouldn't zoom us down, zoom us down instead
+			this._group._map.setView(this._latlng, mapZoom + 1);
+		} else {
+			this._group._map.fitBounds(this._bounds);
+		}
+	},
+
+	getBounds: function () {
+		var bounds = new L.LatLngBounds();
+		bounds.extend(this._bounds);
+		return bounds;
+	},
+
+	_updateIcon: function () {
+		this._iconNeedsUpdate = true;
+		if (this._icon) {
+			this.setIcon(this);
+		}
+	},
+
+	//Cludge for Icon, we pretend to be an icon for performance
+	createIcon: function () {
+		if (this._iconNeedsUpdate) {
+			this._iconObj = this._group.options.iconCreateFunction(this);
+			this._iconNeedsUpdate = false;
+		}
+		return this._iconObj.createIcon();
+	},
+	createShadow: function () {
+		return this._iconObj.createShadow();
+	},
+
+
+	_addChild: function (new1, isNotificationFromChild) {
+
+		this._iconNeedsUpdate = true;
+		this._expandBounds(new1);
+
+		if (new1 instanceof L.MarkerCluster) {
+			if (!isNotificationFromChild) {
+				this._childClusters.push(new1);
+				new1.__parent = this;
+			}
+			this._childCount += new1._childCount;
+		} else {
+			if (!isNotificationFromChild) {
+				this._markers.push(new1);
+			}
+			this._childCount++;
+		}
+
+		if (this.__parent) {
+			this.__parent._addChild(new1, true);
+		}
+	},
+
+	//Expand our bounds and tell our parent to
+	_expandBounds: function (marker) {
+		var addedCount,
+		    addedLatLng = marker._wLatLng || marker._latlng;
+
+		if (marker instanceof L.MarkerCluster) {
+			this._bounds.extend(marker._bounds);
+			addedCount = marker._childCount;
+		} else {
+			this._bounds.extend(addedLatLng);
+			addedCount = 1;
+		}
+
+		if (!this._cLatLng) {
+			// when clustering, take position of the first point as the cluster center
+			this._cLatLng = marker._cLatLng || addedLatLng;
+		}
+
+		// when showing clusters, take weighted average of all points as cluster center
+		var totalCount = this._childCount + addedCount;
+
+		//Calculate weighted latlng for display
+		if (!this._wLatLng) {
+			this._latlng = this._wLatLng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
+		} else {
+			this._wLatLng.lat = (addedLatLng.lat * addedCount + this._wLatLng.lat * this._childCount) / totalCount;
+			this._wLatLng.lng = (addedLatLng.lng * addedCount + this._wLatLng.lng * this._childCount) / totalCount;
+		}
+	},
+
+	//Set our markers position as given and add it to the map
+	_addToMap: function (startPos) {
+		if (startPos) {
+			this._backupLatlng = this._latlng;
+			this.setLatLng(startPos);
+		}
+		this._group._featureGroup.addLayer(this);
+	},
+
+	_recursivelyAnimateChildrenIn: function (bounds, center, maxZoom) {
+		this._recursively(bounds, 0, maxZoom - 1,
+			function (c) {
+				var markers = c._markers,
+					i, m;
+				for (i = markers.length - 1; i >= 0; i--) {
+					m = markers[i];
+
+					//Only do it if the icon is still on the map
+					if (m._icon) {
+						m._setPos(center);
+						m.setOpacity(0);
+					}
+				}
+			},
+			function (c) {
+				var childClusters = c._childClusters,
+					j, cm;
+				for (j = childClusters.length - 1; j >= 0; j--) {
+					cm = childClusters[j];
+					if (cm._icon) {
+						cm._setPos(center);
+						cm.setOpacity(0);
+					}
+				}
+			}
+		);
+	},
+
+	_recursivelyAnimateChildrenInAndAddSelfToMap: function (bounds, previousZoomLevel, newZoomLevel) {
+		this._recursively(bounds, newZoomLevel, 0,
+			function (c) {
+				c._recursivelyAnimateChildrenIn(bounds, c._group._map.latLngToLayerPoint(c.getLatLng()).round(), previousZoomLevel);
+
+				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
+				//As a hack we only do a animation free zoom on a single level zoom, if someone does multiple levels then we always animate
+				if (c._isSingleParent() && previousZoomLevel - 1 === newZoomLevel) {
+					c.setOpacity(1);
+					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
+				} else {
+					c.setOpacity(0);
+				}
+
+				c._addToMap();
+			}
+		);
+	},
+
+	_recursivelyBecomeVisible: function (bounds, zoomLevel) {
+		this._recursively(bounds, 0, zoomLevel, null, function (c) {
+			c.setOpacity(1);
+		});
+	},
+
+	_recursivelyAddChildrenToMap: function (startPos, zoomLevel, bounds) {
+		this._recursively(bounds, -1, zoomLevel,
+			function (c) {
+				if (zoomLevel === c._zoom) {
+					return;
+				}
+
+				//Add our child markers at startPos (so they can be animated out)
+				for (var i = c._markers.length - 1; i >= 0; i--) {
+					var nm = c._markers[i];
+
+					if (!bounds.contains(nm._latlng)) {
+						continue;
+					}
+
+					if (startPos) {
+						nm._backupLatlng = nm.getLatLng();
+
+						nm.setLatLng(startPos);
+						if (nm.setOpacity) {
+							nm.setOpacity(0);
+						}
+					}
+
+					c._group._featureGroup.addLayer(nm);
+				}
+			},
+			function (c) {
+				c._addToMap(startPos);
+			}
+		);
+	},
+
+	_recursivelyRestoreChildPositions: function (zoomLevel) {
+		//Fix positions of child markers
+		for (var i = this._markers.length - 1; i >= 0; i--) {
+			var nm = this._markers[i];
+			if (nm._backupLatlng) {
+				nm.setLatLng(nm._backupLatlng);
+				delete nm._backupLatlng;
+			}
+		}
+
+		if (zoomLevel - 1 === this._zoom) {
+			//Reposition child clusters
+			for (var j = this._childClusters.length - 1; j >= 0; j--) {
+				this._childClusters[j]._restorePosition();
+			}
+		} else {
+			for (var k = this._childClusters.length - 1; k >= 0; k--) {
+				this._childClusters[k]._recursivelyRestoreChildPositions(zoomLevel);
+			}
+		}
+	},
+
+	_restorePosition: function () {
+		if (this._backupLatlng) {
+			this.setLatLng(this._backupLatlng);
+			delete this._backupLatlng;
+		}
+	},
+
+	//exceptBounds: If set, don't remove any markers/clusters in it
+	_recursivelyRemoveChildrenFromMap: function (previousBounds, zoomLevel, exceptBounds) {
+		var m, i;
+		this._recursively(previousBounds, -1, zoomLevel - 1,
+			function (c) {
+				//Remove markers at every level
+				for (i = c._markers.length - 1; i >= 0; i--) {
+					m = c._markers[i];
+					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
+						c._group._featureGroup.removeLayer(m);
+						if (m.setOpacity) {
+							m.setOpacity(1);
+						}
+					}
+				}
+			},
+			function (c) {
+				//Remove child clusters at just the bottom level
+				for (i = c._childClusters.length - 1; i >= 0; i--) {
+					m = c._childClusters[i];
+					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
+						c._group._featureGroup.removeLayer(m);
+						if (m.setOpacity) {
+							m.setOpacity(1);
+						}
+					}
+				}
+			}
+		);
+	},
+
+	//Run the given functions recursively to this and child clusters
+	// boundsToApplyTo: a L.LatLngBounds representing the bounds of what clusters to recurse in to
+	// zoomLevelToStart: zoom level to start running functions (inclusive)
+	// zoomLevelToStop: zoom level to stop running functions (inclusive)
+	// runAtEveryLevel: function that takes an L.MarkerCluster as an argument that should be applied on every level
+	// runAtBottomLevel: function that takes an L.MarkerCluster as an argument that should be applied at only the bottom level
+	_recursively: function (boundsToApplyTo, zoomLevelToStart, zoomLevelToStop, runAtEveryLevel, runAtBottomLevel) {
+		var childClusters = this._childClusters,
+		    zoom = this._zoom,
+			i, c;
+
+		if (zoomLevelToStart > zoom) { //Still going down to required depth, just recurse to child clusters
+			for (i = childClusters.length - 1; i >= 0; i--) {
+				c = childClusters[i];
+				if (boundsToApplyTo.intersects(c._bounds)) {
+					c._recursively(boundsToApplyTo, zoomLevelToStart, zoomLevelToStop, runAtEveryLevel, runAtBottomLevel);
+				}
+			}
+		} else { //In required depth
+
+			if (runAtEveryLevel) {
+				runAtEveryLevel(this);
+			}
+			if (runAtBottomLevel && this._zoom === zoomLevelToStop) {
+				runAtBottomLevel(this);
+			}
+
+			//TODO: This loop is almost the same as above
+			if (zoomLevelToStop > zoom) {
+				for (i = childClusters.length - 1; i >= 0; i--) {
+					c = childClusters[i];
+					if (boundsToApplyTo.intersects(c._bounds)) {
+						c._recursively(boundsToApplyTo, zoomLevelToStart, zoomLevelToStop, runAtEveryLevel, runAtBottomLevel);
+					}
+				}
+			}
+		}
+	},
+
+	_recalculateBounds: function () {
+		var markers = this._markers,
+			childClusters = this._childClusters,
+			i;
+
+		this._bounds = new L.LatLngBounds();
+		delete this._wLatLng;
+
+		for (i = markers.length - 1; i >= 0; i--) {
+			this._expandBounds(markers[i]);
+		}
+		for (i = childClusters.length - 1; i >= 0; i--) {
+			this._expandBounds(childClusters[i]);
+		}
+	},
+
+
+	//Returns true if we are the parent of only one cluster and that cluster is the same as us
+	_isSingleParent: function () {
+		//Don't need to check this._markers as the rest won't work if there are any
+		return this._childClusters.length > 0 && this._childClusters[0]._childCount === this._childCount;
+	}
+});
+
+
+
+L.DistanceGrid = function (cellSize) {
+	this._cellSize = cellSize;
+	this._sqCellSize = cellSize * cellSize;
+	this._grid = {};
+	this._objectPoint = { };
+};
+
+L.DistanceGrid.prototype = {
+
+	addObject: function (obj, point) {
+		var x = this._getCoord(point.x),
+		    y = this._getCoord(point.y),
+		    grid = this._grid,
+		    row = grid[y] = grid[y] || {},
+		    cell = row[x] = row[x] || [],
+		    stamp = L.Util.stamp(obj);
+
+		this._objectPoint[stamp] = point;
+
+		cell.push(obj);
+	},
+
+	updateObject: function (obj, point) {
+		this.removeObject(obj);
+		this.addObject(obj, point);
+	},
+
+	//Returns true if the object was found
+	removeObject: function (obj, point) {
+		var x = this._getCoord(point.x),
+		    y = this._getCoord(point.y),
+		    grid = this._grid,
+		    row = grid[y] = grid[y] || {},
+		    cell = row[x] = row[x] || [],
+		    i, len;
+
+		delete this._objectPoint[L.Util.stamp(obj)];
+
+		for (i = 0, len = cell.length; i < len; i++) {
+			if (cell[i] === obj) {
+
+				cell.splice(i, 1);
+
+				if (len === 1) {
+					delete row[x];
+				}
+
+				return true;
+			}
+		}
+
+	},
+
+	eachObject: function (fn, context) {
+		var i, j, k, len, row, cell, removed,
+		    grid = this._grid;
+
+		for (i in grid) {
+			row = grid[i];
+
+			for (j in row) {
+				cell = row[j];
+
+				for (k = 0, len = cell.length; k < len; k++) {
+					removed = fn.call(context, cell[k]);
+					if (removed) {
+						k--;
+						len--;
+					}
+				}
+			}
+		}
+	},
+
+	getNearObject: function (point) {
+		var x = this._getCoord(point.x),
+		    y = this._getCoord(point.y),
+		    i, j, k, row, cell, len, obj, dist,
+		    objectPoint = this._objectPoint,
+		    closestDistSq = this._sqCellSize,
+		    closest = null;
+
+		for (i = y - 1; i <= y + 1; i++) {
+			row = this._grid[i];
+			if (row) {
+
+				for (j = x - 1; j <= x + 1; j++) {
+					cell = row[j];
+					if (cell) {
+
+						for (k = 0, len = cell.length; k < len; k++) {
+							obj = cell[k];
+							dist = this._sqDist(objectPoint[L.Util.stamp(obj)], point);
+							if (dist < closestDistSq) {
+								closestDistSq = dist;
+								closest = obj;
+							}
+						}
+					}
+				}
+			}
+		}
+		return closest;
+	},
+
+	_getCoord: function (x) {
+		return Math.floor(x / this._cellSize);
+	},
+
+	_sqDist: function (p, p2) {
+		var dx = p2.x - p.x,
+		    dy = p2.y - p.y;
+		return dx * dx + dy * dy;
+	}
+};
+
+
+/* Copyright (c) 2012 the authors listed at the following URL, and/or
+the authors of referenced articles or incorporated external code:
+http://en.literateprograms.org/Quickhull_(Javascript)?action=history&offset=20120410175256
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=18434
+*/
+
+(function () {
+	L.QuickHull = {
+
+		/*
+		 * @param {Object} cpt a point to be measured from the baseline
+		 * @param {Array} bl the baseline, as represented by a two-element
+		 *   array of latlng objects.
+		 * @returns {Number} an approximate distance measure
+		 */
+		getDistant: function (cpt, bl) {
+			var vY = bl[1].lat - bl[0].lat,
+				vX = bl[0].lng - bl[1].lng;
+			return (vX * (cpt.lat - bl[0].lat) + vY * (cpt.lng - bl[0].lng));
+		},
+
+		/*
+		 * @param {Array} baseLine a two-element array of latlng objects
+		 *   representing the baseline to project from
+		 * @param {Array} latLngs an array of latlng objects
+		 * @returns {Object} the maximum point and all new points to stay
+		 *   in consideration for the hull.
+		 */
+		findMostDistantPointFromBaseLine: function (baseLine, latLngs) {
+			var maxD = 0,
+				maxPt = null,
+				newPoints = [],
+				i, pt, d;
+
+			for (i = latLngs.length - 1; i >= 0; i--) {
+				pt = latLngs[i];
+				d = this.getDistant(pt, baseLine);
+
+				if (d > 0) {
+					newPoints.push(pt);
+				} else {
+					continue;
+				}
+
+				if (d > maxD) {
+					maxD = d;
+					maxPt = pt;
+				}
+			}
+
+			return { maxPoint: maxPt, newPoints: newPoints };
+		},
+
+
+		/*
+		 * Given a baseline, compute the convex hull of latLngs as an array
+		 * of latLngs.
+		 *
+		 * @param {Array} latLngs
+		 * @returns {Array}
+		 */
+		buildConvexHull: function (baseLine, latLngs) {
+			var convexHullBaseLines = [],
+				t = this.findMostDistantPointFromBaseLine(baseLine, latLngs);
+
+			if (t.maxPoint) { // if there is still a point "outside" the base line
+				convexHullBaseLines =
+					convexHullBaseLines.concat(
+						this.buildConvexHull([baseLine[0], t.maxPoint], t.newPoints)
+					);
+				convexHullBaseLines =
+					convexHullBaseLines.concat(
+						this.buildConvexHull([t.maxPoint, baseLine[1]], t.newPoints)
+					);
+				return convexHullBaseLines;
+			} else {  // if there is no more point "outside" the base line, the current base line is part of the convex hull
+				return [baseLine[0]];
+			}
+		},
+
+		/*
+		 * Given an array of latlngs, compute a convex hull as an array
+		 * of latlngs
+		 *
+		 * @param {Array} latLngs
+		 * @returns {Array}
+		 */
+		getConvexHull: function (latLngs) {
+			// find first baseline
+			var maxLat = false, minLat = false,
+				maxPt = null, minPt = null,
+				i;
+
+			for (i = latLngs.length - 1; i >= 0; i--) {
+				var pt = latLngs[i];
+				if (maxLat === false || pt.lat > maxLat) {
+					maxPt = pt;
+					maxLat = pt.lat;
+				}
+				if (minLat === false || pt.lat < minLat) {
+					minPt = pt;
+					minLat = pt.lat;
+				}
+			}
+			var ch = [].concat(this.buildConvexHull([minPt, maxPt], latLngs),
+								this.buildConvexHull([maxPt, minPt], latLngs));
+			return ch;
+		}
+	};
+}());
+
+L.MarkerCluster.include({
+	getConvexHull: function () {
+		var childMarkers = this.getAllChildMarkers(),
+			points = [],
+			p, i;
+
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			p = childMarkers[i].getLatLng();
+			points.push(p);
+		}
+
+		return L.QuickHull.getConvexHull(points);
+	}
+});
+
+
+//This code is 100% based on https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet
+//Huge thanks to jawj for implementing it first to make my job easy :-)
+
+L.MarkerCluster.include({
+
+	_2PI: Math.PI * 2,
+	_circleFootSeparation: 25, //related to circumference of circle
+	_circleStartAngle: Math.PI / 6,
+
+	_spiralFootSeparation:  28, //related to size of spiral (experiment!)
+	_spiralLengthStart: 11,
+	_spiralLengthFactor: 5,
+
+	_circleSpiralSwitchover: 9, //show spiral instead of circle from this marker count upwards.
+								// 0 -> always spiral; Infinity -> always circle
+
+	spiderfy: function () {
+		if (this._group._spiderfied === this || this._group._inZoomAnimation) {
+			return;
+		}
+
+		var childMarkers = this.getAllChildMarkers(),
+			group = this._group,
+			map = group._map,
+			center = map.latLngToLayerPoint(this._latlng),
+			positions;
+
+		this._group._unspiderfy();
+		this._group._spiderfied = this;
+
+		//TODO Maybe: childMarkers order by distance to center
+
+		if (childMarkers.length >= this._circleSpiralSwitchover) {
+			positions = this._generatePointsSpiral(childMarkers.length, center);
+		} else {
+			center.y += 10; //Otherwise circles look wrong
+			positions = this._generatePointsCircle(childMarkers.length, center);
+		}
+
+		this._animationSpiderfy(childMarkers, positions);
+	},
+
+	unspiderfy: function (zoomDetails) {
+		/// <param Name="zoomDetails">Argument from zoomanim if being called in a zoom animation or null otherwise</param>
+		if (this._group._inZoomAnimation) {
+			return;
+		}
+		this._animationUnspiderfy(zoomDetails);
+
+		this._group._spiderfied = null;
+	},
+
+	_generatePointsCircle: function (count, centerPt) {
+		var circumference = this._group.options.spiderfyDistanceMultiplier * this._circleFootSeparation * (2 + count),
+			legLength = circumference / this._2PI,  //radius from circumference
+			angleStep = this._2PI / count,
+			res = [],
+			i, angle;
+
+		res.length = count;
+
+		for (i = count - 1; i >= 0; i--) {
+			angle = this._circleStartAngle + i * angleStep;
+			res[i] = new L.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle))._round();
+		}
+
+		return res;
+	},
+
+	_generatePointsSpiral: function (count, centerPt) {
+		var legLength = this._group.options.spiderfyDistanceMultiplier * this._spiralLengthStart,
+			separation = this._group.options.spiderfyDistanceMultiplier * this._spiralFootSeparation,
+			lengthFactor = this._group.options.spiderfyDistanceMultiplier * this._spiralLengthFactor,
+			angle = 0,
+			res = [],
+			i;
+
+		res.length = count;
+
+		for (i = count - 1; i >= 0; i--) {
+			angle += separation / legLength + i * 0.0005;
+			res[i] = new L.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle))._round();
+			legLength += this._2PI * lengthFactor / angle;
+		}
+		return res;
+	},
+
+	_noanimationUnspiderfy: function () {
+		var group = this._group,
+			map = group._map,
+			fg = group._featureGroup,
+			childMarkers = this.getAllChildMarkers(),
+			m, i;
+
+		this.setOpacity(1);
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			fg.removeLayer(m);
+
+			if (m._preSpiderfyLatlng) {
+				m.setLatLng(m._preSpiderfyLatlng);
+				delete m._preSpiderfyLatlng;
+			}
+			if (m.setZIndexOffset) {
+				m.setZIndexOffset(0);
+			}
+
+			if (m._spiderLeg) {
+				map.removeLayer(m._spiderLeg);
+				delete m._spiderLeg;
+			}
+		}
+
+		group._spiderfied = null;
+	}
+});
+
+L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
+	//Non Animated versions of everything
+	_animationSpiderfy: function (childMarkers, positions) {
+		var group = this._group,
+			map = group._map,
+			fg = group._featureGroup,
+			i, m, leg, newPos;
+
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			newPos = map.layerPointToLatLng(positions[i]);
+			m = childMarkers[i];
+
+			m._preSpiderfyLatlng = m._latlng;
+			m.setLatLng(newPos);
+			if (m.setZIndexOffset) {
+				m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
+			}
+
+			fg.addLayer(m);
+
+
+			leg = new L.Polyline([this._latlng, newPos], { weight: 1.5, color: '#222' });
+			map.addLayer(leg);
+			m._spiderLeg = leg;
+		}
+		this.setOpacity(0.3);
+		group.fire('spiderfied');
+	},
+
+	_animationUnspiderfy: function () {
+		this._noanimationUnspiderfy();
+	}
+} : {
+	//Animated versions here
+	SVG_ANIMATION: (function () {
+		return document.createElementNS('http://www.w3.org/2000/svg', 'animate').toString().indexOf('SVGAnimate') > -1;
+	}()),
+
+	_animationSpiderfy: function (childMarkers, positions) {
+		var me = this,
+			group = this._group,
+			map = group._map,
+			fg = group._featureGroup,
+			thisLayerPos = map.latLngToLayerPoint(this._latlng),
+			i, m, leg, newPos;
+
+		//Add markers to map hidden at our center point
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			//If it is a marker, add it now and we'll animate it out
+			if (m.setOpacity) {
+				m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
+				m.setOpacity(0);
+			
+				fg.addLayer(m);
+
+				m._setPos(thisLayerPos);
+			} else {
+				//Vectors just get immediately added
+				fg.addLayer(m);
+			}
+		}
+
+		group._forceLayout();
+		group._animationStart();
+
+		var initialLegOpacity = L.Path.SVG ? 0 : 0.3,
+			xmlns = L.Path.SVG_NS;
+
+
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			newPos = map.layerPointToLatLng(positions[i]);
+			m = childMarkers[i];
+
+			//Move marker to new position
+			m._preSpiderfyLatlng = m._latlng;
+			m.setLatLng(newPos);
+			
+			if (m.setOpacity) {
+				m.setOpacity(1);
+			}
+
+
+			//Add Legs.
+			leg = new L.Polyline([me._latlng, newPos], { weight: 1.5, color: '#222', opacity: initialLegOpacity });
+			map.addLayer(leg);
+			m._spiderLeg = leg;
+
+			//Following animations don't work for canvas
+			if (!L.Path.SVG || !this.SVG_ANIMATION) {
+				continue;
+			}
+
+			//How this works:
+			//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
+			//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
+
+			//Animate length
+			var length = leg._path.getTotalLength();
+			leg._path.setAttribute("stroke-dasharray", length + "," + length);
+
+			var anim = document.createElementNS(xmlns, "animate");
+			anim.setAttribute("attributeName", "stroke-dashoffset");
+			anim.setAttribute("begin", "indefinite");
+			anim.setAttribute("from", length);
+			anim.setAttribute("to", 0);
+			anim.setAttribute("dur", 0.25);
+			leg._path.appendChild(anim);
+			anim.beginElement();
+
+			//Animate opacity
+			anim = document.createElementNS(xmlns, "animate");
+			anim.setAttribute("attributeName", "stroke-opacity");
+			anim.setAttribute("attributeName", "stroke-opacity");
+			anim.setAttribute("begin", "indefinite");
+			anim.setAttribute("from", 0);
+			anim.setAttribute("to", 0.5);
+			anim.setAttribute("dur", 0.25);
+			leg._path.appendChild(anim);
+			anim.beginElement();
+		}
+		me.setOpacity(0.3);
+
+		//Set the opacity of the spiderLegs back to their correct value
+		// The animations above override this until they complete.
+		// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
+		if (L.Path.SVG) {
+			this._group._forceLayout();
+
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i]._spiderLeg;
+
+				m.options.opacity = 0.5;
+				m._path.setAttribute('stroke-opacity', 0.5);
+			}
+		}
+
+		setTimeout(function () {
+			group._animationEnd();
+			group.fire('spiderfied');
+		}, 200);
+	},
+
+	_animationUnspiderfy: function (zoomDetails) {
+		var group = this._group,
+			map = group._map,
+			fg = group._featureGroup,
+			thisLayerPos = zoomDetails ? map._latLngToNewLayerPoint(this._latlng, zoomDetails.zoom, zoomDetails.center) : map.latLngToLayerPoint(this._latlng),
+			childMarkers = this.getAllChildMarkers(),
+			svg = L.Path.SVG && this.SVG_ANIMATION,
+			m, i, a;
+
+		group._animationStart();
+
+		//Make us visible and bring the child markers back in
+		this.setOpacity(1);
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			//Marker was added to us after we were spidified
+			if (!m._preSpiderfyLatlng) {
+				continue;
+			}
+
+			//Fix up the location to the real one
+			m.setLatLng(m._preSpiderfyLatlng);
+			delete m._preSpiderfyLatlng;
+			//Hack override the location to be our center
+			if (m.setOpacity) {
+				m._setPos(thisLayerPos);
+				m.setOpacity(0);
+			} else {
+				fg.removeLayer(m);
+			}
+
+			//Animate the spider legs back in
+			if (svg) {
+				a = m._spiderLeg._path.childNodes[0];
+				a.setAttribute('to', a.getAttribute('from'));
+				a.setAttribute('from', 0);
+				a.beginElement();
+
+				a = m._spiderLeg._path.childNodes[1];
+				a.setAttribute('from', 0.5);
+				a.setAttribute('to', 0);
+				a.setAttribute('stroke-opacity', 0);
+				a.beginElement();
+
+				m._spiderLeg._path.setAttribute('stroke-opacity', 0);
+			}
+		}
+
+		setTimeout(function () {
+			//If we have only <= one child left then that marker will be shown on the map so don't remove it!
+			var stillThereChildCount = 0;
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i];
+				if (m._spiderLeg) {
+					stillThereChildCount++;
+				}
+			}
+
+
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i];
+
+				if (!m._spiderLeg) { //Has already been unspiderfied
+					continue;
+				}
+
+
+				if (m.setOpacity) {
+					m.setOpacity(1);
+					m.setZIndexOffset(0);
+				}
+
+				if (stillThereChildCount > 1) {
+					fg.removeLayer(m);
+				}
+
+				map.removeLayer(m._spiderLeg);
+				delete m._spiderLeg;
+			}
+			group._animationEnd();
+		}, 200);
+	}
+});
+
+
+L.MarkerClusterGroup.include({
+	//The MarkerCluster currently spiderfied (if any)
+	_spiderfied: null,
+
+	_spiderfierOnAdd: function () {
+		this._map.on('click', this._unspiderfyWrapper, this);
+
+		if (this._map.options.zoomAnimation) {
+			this._map.on('zoomstart', this._unspiderfyZoomStart, this);
+		}
+		//Browsers without zoomAnimation or a big zoom don't fire zoomstart
+		this._map.on('zoomend', this._noanimationUnspiderfy, this);
+
+		if (L.Path.SVG && !L.Browser.touch) {
+			this._map._initPathRoot();
+			//Needs to happen in the pageload, not after, or animations don't work in webkit
+			//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
+			//Disable on touch browsers as the animation messes up on a touch zoom and isn't very noticable
+		}
+	},
+
+	_spiderfierOnRemove: function () {
+		this._map.off('click', this._unspiderfyWrapper, this);
+		this._map.off('zoomstart', this._unspiderfyZoomStart, this);
+		this._map.off('zoomanim', this._unspiderfyZoomAnim, this);
+
+		this._unspiderfy(); //Ensure that markers are back where they should be
+	},
+
+
+	//On zoom start we add a zoomanim handler so that we are guaranteed to be last (after markers are animated)
+	//This means we can define the animation they do rather than Markers doing an animation to their actual location
+	_unspiderfyZoomStart: function () {
+		if (!this._map) { //May have been removed from the map by a zoomEnd handler
+			return;
+		}
+
+		this._map.on('zoomanim', this._unspiderfyZoomAnim, this);
+	},
+	_unspiderfyZoomAnim: function (zoomDetails) {
+		//Wait until the first zoomanim after the user has finished touch-zooming before running the animation
+		if (L.DomUtil.hasClass(this._map._mapPane, 'leaflet-touching')) {
+			return;
+		}
+
+		this._map.off('zoomanim', this._unspiderfyZoomAnim, this);
+		this._unspiderfy(zoomDetails);
+	},
+
+
+	_unspiderfyWrapper: function () {
+		/// <summary>_unspiderfy but passes no arguments</summary>
+		this._unspiderfy();
+	},
+
+	_unspiderfy: function (zoomDetails) {
+		if (this._spiderfied) {
+			this._spiderfied.unspiderfy(zoomDetails);
+		}
+	},
+
+	_noanimationUnspiderfy: function () {
+		if (this._spiderfied) {
+			this._spiderfied._noanimationUnspiderfy();
+		}
+	},
+
+	//If the given layer is currently being spiderfied then we unspiderfy it so it isn't on the map anymore etc
+	_unspiderfyLayer: function (layer) {
+		if (layer._spiderLeg) {
+			this._featureGroup.removeLayer(layer);
+
+			layer.setOpacity(1);
+			//Position will be fixed up immediately in _animationUnspiderfy
+			layer.setZIndexOffset(0);
+
+			this._map.removeLayer(layer._spiderLeg);
+			delete layer._spiderLeg;
+		}
+	}
+});
+
+
+}(window, document));
 var app = angular.module('App', ['ngSanitize', 'ui.select']);
 
 app.filter('propsFilter', function () {
@@ -433,6 +2538,10 @@ app.controller('AppController', function ($scope) {
 	var map = L.mapbox.map('map')
 		.setView([52.5, 13.4], 4)
 		.addLayer(L.mapbox.tileLayer('mapbox.light'));
+
+	var credits = L.control.attribution({position: 'bottomleft'}).addTo(map).setPrefix('');
+	credits.addAttribution("<a href='https://docs.google.com/spreadsheets/d/1q6abjEuSgHm-4gJ0-XUFZqyniGYlcOPeLOV-y-wF0uM/export?format=tsv'>Download Data</a> | <a href='https://docs.google.com/forms/d/1486hog2LBoH_08BmZl1VU6bEcy1GdhGBZzQOyvQOfLM/formResponse'>Add your entry here</a>");
+
 	var layerGroup = L.layerGroup().addTo(map);
 	var data_layers = undefined;
 
@@ -444,7 +2553,13 @@ app.controller('AppController', function ($scope) {
 				if (filters[s].indexOf(layer.feature.properties[s]) < 0)
 					filters[s].push(layer.feature.properties[s]);
 			});
-			layer.bindPopup([layer.feature.properties.name, layer.feature.properties.city, layer.feature.properties.country].join(','));
+			layer.bindPopup('<h2>' + layer.feature.properties.name + '</h2>' +
+				(layer.feature.properties.url ?
+				'<a target="_blank" href="' + (layer.feature.properties.url.indexOf('http') !== 0 ? 'http://' : '') + layer.feature.properties.url + '">' + layer.feature.properties.url + '</a><br/>'
+					: '') +
+				layer.feature.properties.industry + ', ' + layer.feature.properties.sector + ', ' + layer.feature.properties.size + '<br/>' +
+				(layer.feature.properties.city ? layer.feature.properties.city + ', ' : '') + layer.feature.properties.country
+			);
 		});
 		Object.keys(filters).forEach(function (key) {
 			filters[key].sort(function (a, b) {

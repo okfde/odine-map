@@ -35,23 +35,11 @@
 		<ui-select-choices repeat="o in filters.size | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
 	</ui-select>
 
-	<h3>Group</h3>
-	<ui-select multiple ng-model="selected.group" theme="select2">
-		<ui-select-match placeholder="Filter group...">{{$item.name}}</ui-select-match>
-		<ui-select-choices repeat="o in filters.group | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
+	<h3>Industry</h3>
+	<ui-select multiple ng-model="selected.industry" theme="select2">
+		<ui-select-match placeholder="Filter industry...">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="o in filters.industry | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>
 	</ui-select>
-
-	<!--<h3>Type</h3>-->
-	<!--<ui-select multiple ng-model="selected.type" theme="select2">-->
-	<!--<ui-select-match placeholder="Filter type...">{{$item.name}}</ui-select-match>-->
-	<!--<ui-select-choices repeat="o in filters.type | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>-->
-	<!--</ui-select>-->
-
-	<!--<h3>Year</h3>-->
-	<!--<ui-select multiple ng-model="selected.year" theme="select2">-->
-	<!--<ui-select-match placeholder="Filter year...">{{$item.name}}</ui-select-match>-->
-	<!--<ui-select-choices repeat="o in filters.year | propsFilter: {name: $select.search}">{{o.name||'Unknown'}}</ui-select-choices>-->
-	<!--</ui-select>-->
 </div>
 
 </body>
