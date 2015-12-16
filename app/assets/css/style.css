@@ -45,6 +45,15 @@ body {
   height: 100%;
   weight: 100%; }
 
+.mapbox-improve-map, .mapbox-logo {
+  display: none; }
+
+.leaflet-popup-content h2 {
+  margin-bottom: 0; }
+
+.leaflet-control-attribution {
+  padding-left: 10px; }
+
 #logo {
   position: absolute;
   top: 0.6em;
@@ -64,12 +73,12 @@ body {
 .select2-drop,
 .select2-search,
 .select2-search input {
-  	/*
-  	  Force border-box so that % widths fit the parent
-  	  container without overlap because of margin/padding.
-  
-  	  More Info : http://www.quirksmode.org/css/box.html
-  	*/
+  /*
+    Force border-box so that % widths fit the parent
+    container without overlap because of margin/padding.
+
+    More Info : http://www.quirksmode.org/css/box.html
+  */
   -webkit-box-sizing: border-box;
   /* webkit */
   -moz-box-sizing: border-box;

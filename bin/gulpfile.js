@@ -70,12 +70,13 @@ gulp.task('tsv2json', function () {
 				name: cols[0].trim(),
 				country: cols[1].trim(),
 				sector: cols[2].trim(),
-				group: cols[3].trim(),
+				industry: cols[3].trim(),
 				desc: cols[4].trim(),
 				departments: cols[5].trim(),
 				city: cols[6].trim(),
 				year: cols[7].trim(),
 				size: cols[8].trim(),
+				url: cols[9].trim(),
 				id: (cols[10] || '').trim(),
 				type: (cols[11] || '').trim()
 			}

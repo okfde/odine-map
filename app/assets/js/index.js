@@ -39,6 +39,10 @@ app.controller('AppController', function ($scope) {
 	var map = L.mapbox.map('map')
 		.setView([52.5, 13.4], 4)
 		.addLayer(L.mapbox.tileLayer('mapbox.light'));
+
+	var credits = L.control.attribution({position: 'bottomleft'}).addTo(map).setPrefix('');
+	credits.addAttribution("<a href='https://docs.google.com/spreadsheets/d/1q6abjEuSgHm-4gJ0-XUFZqyniGYlcOPeLOV-y-wF0uM/export?format=tsv'>Download Data</a> | <a href='https://docs.google.com/forms/d/1486hog2LBoH_08BmZl1VU6bEcy1GdhGBZzQOyvQOfLM/formResponse'>Add your entry here</a>");
+
 	var layerGroup = L.layerGroup().addTo(map);
 	var data_layers = undefined;
 
@@ -50,7 +54,13 @@ app.controller('AppController', function ($scope) {
 				if (filters[s].indexOf(layer.feature.properties[s]) < 0)
 					filters[s].push(layer.feature.properties[s]);
 			});
-			layer.bindPopup([layer.feature.properties.name, layer.feature.properties.city, layer.feature.properties.country].join(','));
+			layer.bindPopup('<h2>' + layer.feature.properties.name + '</h2>' +
+				(layer.feature.properties.url ?
+				'<a target="_blank" href="' + (layer.feature.properties.url.indexOf('http') !== 0 ? 'http://' : '') + layer.feature.properties.url + '">' + layer.feature.properties.url + '</a><br/>'
+					: '') +
+				layer.feature.properties.industry + ', ' + layer.feature.properties.sector + ', ' + layer.feature.properties.size + '<br/>' +
+				(layer.feature.properties.city ? layer.feature.properties.city + ', ' : '') + layer.feature.properties.country
+			);
 		});
 		Object.keys(filters).forEach(function (key) {
 			filters[key].sort(function (a, b) {
