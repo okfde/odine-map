@@ -17,6 +17,9 @@
 , {"city": "Warsaw, Poland", "ll": "52.2296756,21.0122287"}
 , {"city": "Belgrade, Serbia", "ll": "44.802416,20.465601"}
 , {"city": "Vienna, Austria", "ll": "48.2081743,16.3738189"}
+, {"city": "Salzburg, Austria", "ll": "47.811195,13.033229"}
+, {"city": "Stotzing, Austria", "ll": "47.9070992,16.5438685"}
+, {"city": "Nötsch, Austria", "ll": "46.588847,13.621511"}
 , {"city": "Kharkiv, Kharkivs'ka oblast, Ukraine, 61000", "ll": "49.9935,36.230383"}
 , {"city": "Barcelona, Spain", "ll": "41.387917,2.1699187"}
 , {"city": "Novosibirsk, Novosibirskaya oblast, Russia", "ll": "55.0333333,82.9166667"}

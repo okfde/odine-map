@@ -4,7 +4,7 @@ var useref = require('gulp-useref');
 
 gulp.task('assets-img', function () {
 	gulp.src(['../app/assets/img/**/*'])
-			.pipe(gulp.dest('../dist/assets/img'));
+		.pipe(gulp.dest('../dist/assets/img'));
 	gulp.src(['../app/assets/css/images/**/*'])
 		.pipe(gulp.dest('../dist/assets/css/images'));
 	return gulp.src(['../app/assets/bower_components/mapbox.js/images/**/*'])
@@ -63,21 +63,21 @@ gulp.task('tsv2json', function () {
 		var feature = {
 			"type": "Feature",
 			"geometry": {
-				"coordinates": findLatLng(cols[6], cols[1]),
+				"coordinates": findLatLng(cols[6].trim(), cols[1].trim()),
 				"type": "Point"
 			},
 			properties: {
-				name: cols[0],
-				country: cols[1],
-				sector: cols[2],
-				group: cols[3],
-				desc: cols[4],
-				departments: cols[5],
-				city: cols[6],
-				year: cols[7],
-				size: cols[8],
-				id: cols[10],
-				type: cols[11]
+				name: cols[0].trim(),
+				country: cols[1].trim(),
+				sector: cols[2].trim(),
+				group: cols[3].trim(),
+				desc: cols[4].trim(),
+				departments: cols[5].trim(),
+				city: cols[6].trim(),
+				year: cols[7].trim(),
+				size: cols[8].trim(),
+				id: (cols[10] || '').trim(),
+				type: (cols[11] || '').trim()
 			}
 		};
 		list.push(feature);
