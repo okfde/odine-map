@@ -2531,15 +2531,15 @@ app.filter('propsFilter', function () {
 
 app.controller('AppController', function ($scope) {
 	$scope.selected = {};
-	var filter_keys = ['country', 'sector', 'size', 'group', 'type', 'year'];
+	var filter_keys = ['country', 'sector', 'size', 'industry'];
 
-	L.mapbox.accessToken = 'pk.eyJ1IjoiZmZhbHQiLCJhIjoibzVMNnJxQSJ9.NoyJqnSK66uDNvfqca_kPA';
+	L.mapbox.accessToken = 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2lpOHhvMnNhMDAyNnZla280ZWhmMm96NyJ9.IvGz74dvvukg19B4Npsm1g';
 	var map = L.mapbox.map('map')
 		.setView([52.5, 13.4], 4)
 		.addLayer(L.mapbox.tileLayer('mapbox.light'));
 
 	var credits = L.control.attribution({position: 'bottomleft'}).addTo(map).setPrefix('');
-	credits.addAttribution("<a href='https://docs.google.com/spreadsheets/d/1q6abjEuSgHm-4gJ0-XUFZqyniGYlcOPeLOV-y-wF0uM/export?format=tsv'>Download Data</a> | <a href='https://docs.google.com/forms/d/1486hog2LBoH_08BmZl1VU6bEcy1GdhGBZzQOyvQOfLM/formResponse'>Add your entry here</a>");
+	credits.addAttribution("<a href='https://docs.google.com/spreadsheets/d/14A_AJkz2PFE_ZOhD_iq4jbAKl747QcpbdRlglOY3REI/export?format=tsv'>Download Data</a> | <a href='https://docs.google.com/forms/d/1486hog2LBoH_08BmZl1VU6bEcy1GdhGBZzQOyvQOfLM/formResponse'>Add your entry here</a>");
 
 	var layerGroup = L.layerGroup().addTo(map);
 	var data_layers = undefined;
