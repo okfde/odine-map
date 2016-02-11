@@ -24,7 +24,7 @@ gulp.task('bundle', function () {
 
 gulp.task('tsv2json', function () {
 	var destFile = '../app/assets/data/features.json';
-	var srcFile = './data/OD5.4-database-deliverable - Sheet1.tsv';
+	var srcFile = './data/data.tsv';
 
 // Collection of most used Cities geocoded for latitude/longitude
 	var cities = JSON.parse(fs.readFileSync('./data/cities.json').toString());
@@ -51,34 +51,58 @@ gulp.task('tsv2json', function () {
 		if (results.length == 1) {
 			return getLatLngFromString(results[0].ll);
 		}
+		var parts = city.split(',');
+		var maybeparts = parts.filter(function (p) {
+			p = p.trim();
+			var r = cities.filter(function (c) {
+				return c.city.indexOf(p + ',') == 0;
+			});
+			return r.length > 0;
+		});
+		if (maybeparts.length == 1) {
+			results = cities.filter(function (c) {
+				return c.city.indexOf(maybeparts[0].trim() + ',') == 0;
+			});
+		}
+		if (results.length == 1) {
+			return getLatLngFromString(results[0].ll);
+		}
+		console.log('maybeparts', maybeparts);
+
 		console.log('möp, city not found', city, country, results);
 		return [0, 0];
+	};
+
+	var prepareCol = function (s) {
+		return (s || '').trim();
 	};
 
 	var tsv = fs.readFileSync(srcFile).toString().split('\n');
 	tsv.shift(); //strip header
 	var list = [];
 	tsv.forEach(function (line) {
+		if (line.trim().length == 0) return;
 		var cols = line.split('\t');
 		var feature = {
 			"type": "Feature",
 			"geometry": {
-				"coordinates": findLatLng(cols[6].trim(), cols[1].trim()),
+				"coordinates": findLatLng(prepareCol(cols[6]), prepareCol(cols[1])),
 				"type": "Point"
 			},
 			properties: {
-				name: cols[0].trim(),
-				country: cols[1].trim(),
-				sector: cols[2].trim(),
-				industry: cols[3].trim(),
-				desc: cols[4].trim(),
-				departments: cols[5].trim(),
-				city: cols[6].trim(),
-				year: cols[7].trim(),
-				size: cols[8].trim(),
-				url: cols[9].trim(),
-				id: (cols[10] || '').trim(),
-				type: (cols[11] || '').trim()
+				name: prepareCol(cols[0]),
+				country: prepareCol(cols[1]),
+				sector: prepareCol(cols[2]),
+				industry: prepareCol(cols[3]),
+				desc: prepareCol(cols[4]),
+				departments: prepareCol(cols[5]),
+				city: prepareCol(cols[6]),
+				year: prepareCol(cols[7]),
+				size: prepareCol(cols[8]),
+				url: prepareCol(cols[9]),
+				odsets: prepareCol(cols[10]),
+				tw: prepareCol(cols[11]),
+				financials: prepareCol(cols[12])
 			}
 		};
 		list.push(feature);
@@ -87,7 +111,7 @@ gulp.task('tsv2json', function () {
 		"type": "FeatureCollection",
 		"features": list
 	}));
-	console.log('All done, converted', list.length, 'entries');
+	//console.log('All done, converted', list.length, 'entries');
 });
 
 gulp.task('default', ['tsv2json', 'bundle', 'assets-data', 'assets-img']);

@@ -2,15 +2,6 @@
 
 Data-Generator & Web App for a Clustered & Filter Map
 
-##To Discuss
-* Invalid data (e.g. City: Athens, Country: Austria)
-* Incomplete data (e.g. no city)
-* Grouping in filter for "Year", "Country"?
-* Mutli-Select or Single-List-Select? // now: Multi
-* Design/Colors
-* Use cities or country centers for marker positions // now: Cities 
-* Mobile version?
-
 ##Used Software
 you need <a href="http://gruntjs.com/">grunt</a> & <a href="http://bower.io/">bower</a>
 

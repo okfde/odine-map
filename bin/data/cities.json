@@ -91,7 +91,7 @@
 , {"city": "Helsinki, Finland", "ll": "60.169845,24.9385508"}
 , {"city": "Malaga, Spain", "ll": "36.7196484,-4.420016299999999"}
 , {"city": "Bremen, Germany", "ll": "53.0847558,8.8208279"}
-, {"city": "Sheffield, South Yorkshire, UK", "ll": "53.38112899999999,-1.470085"}
+, {"city": "Sheffield, UK", "ll": "53.38112899999999,-1.470085"}
 , {"city": "Sarajevo, Bosnia and Herzegovina", "ll": "43.8476,18.3564"}
 , {"city": "Penza, Penza Oblast, Russia", "ll": "53.2,45.01666669999999"}
 , {"city": "Ryazan, Ryazanskaya oblast, Russia", "ll": "54.6166667,39.7333333"}
@@ -109,7 +109,7 @@
 , {"city": "Mariupol', Donets'ka oblast, Ukraine, 87500", "ll": "47.097133,37.543367"}
 , {"city": "Leipzig, Germany", "ll": "51.3490384,12.3938226"}
 , {"city": "Nuremberg, Germany", "ll": "49.4451843,11.087422"}
-, {"city": "Bradford, West Yorkshire, UK", "ll": "53.795984,-1.759398"}
+, {"city": "Bradford, UK", "ll": "53.795984,-1.759398"}
 , {"city": "Astrakhan, Astrakhanskaya oblast, Russia", "ll": "46.35,48.05"}
 , {"city": "Dublin, Co. Dublin, Ireland", "ll": "53.34410399999999,-6.267493699999999"}
 , {"city": "Tomsk, Tomskaya oblast, Russia", "ll": "56.5,84.96666669999999"}
@@ -482,7 +482,7 @@
 , {"city": "Brighton, Brighton and Hove, UK", "ll": "50.842941,-0.131312"}
 , {"city": "South Tyneside, UK", "ll": "54.9636693,-1.4418634"}
 , {"city": "Charnwood, 1a Granby St, Loughborough, Leicestershire LE11 3DU, UK", "ll": "52.7705129,-1.2105882"}
-, {"city": "Aylesbury, Buckinghamshire, UK", "ll": "51.815606,-0.8084"}
+, {"city": "Aylesbury, UK", "ll": "51.815606,-0.8084"}
 , {"city": "Colchester, Essex, UK", "ll": "51.895927,0.8918740000000001"}
 , {"city": "Oldenburg, Germany", "ll": "53.14773899999999,8.2106028"}
 , {"city": "Knowsley, Merseyside, UK", "ll": "53.454594,-2.852907"}
@@ -541,4 +541,41 @@
 , {"city": "Didcot, UK", "ll": "51.608044,-1.24484"}
 , {"city": "Bath, UK", "ll": "51.375801,-2.3599039"}
 , {"city": "Crowborough, UK", "ll": "51.060853,0.165894"}
+, {"city": "Livorno, Italy", "ll": "43.5485,10.3106"}
+, {"city": "Roma, Italy", "ll": "41.8905,12.4942"}
+, {"city": "Milano, Italy", "ll": "45.4655,9.1865"}
+, {"city": "Trento, Italy", "ll": "46.0697,11.1211"}
+, {"city": "Sesto Calende, Italy", "ll": "45.7307,8.6366"}
+, {"city": "Astana, Kazakhstan", "ll": "51.1667,71.4333"}
+, {"city": "Porto, Portugal", "ll": "41.15,-8.6102"}
+, {"city": "Mutilva Alta, Spain", "ll": "42.8,-1.6167"}
+, {"city": "Ödåkra, Sweden", "ll": "56.1,12.7333"}
+, {"city": "Burgess Hill, UK", "ll": "50.9545,-0.1287"}
+, {"city": "Hoddesdon, UK", "ll": "51.760007,-0.015042"}
+, {"city": "Woking, UK", "ll": "51.3168,-0.56"}
+, {"city": "Canterbury, UK", "ll": "51.2802,1.0789"}
+, {"city": "Maidenhead, UK", "ll": "51.5224,-0.7219"}
+, {"city": "Slough, UK", "ll": "51.5105,-0.595"}
+, {"city": "Bracknell, UK", "ll": "51.416,-0.754"}
+, {"city": "Guildford, UK", "ll": "51.2362,-0.5704"}
+, {"city": "Hungerford, UK", "ll": "51.412345,-1.517995"}
+, {"city": "Ewloe, UK", "ll": "53.188496,-3.048273"}
+, {"city": "Norwich, UK", "ll": "52.6309,1.2974"}
+, {"city": "High Wycombe, UK", "ll": "51.6286,-0.7482"}
+, {"city": "Houghton le Spring, UK", "ll": "54.841016,-1.468691"}
+, {"city": "Houghton-le-Spring, UK", "ll": "54.841016,-1.468691"}
+, {"city": "Watford, UK", "ll": "51.6565,-0.3903"}
+, {"city": "Weybridge, UK", "ll": "51.3716269,-0.457904"}
+, {"city": "Hayes, UK", "ll": "51.5168,-0.4368"}
+, {"city": "Eversley, UK", "ll": "51.35248,-0.889119"}
+, {"city": "Hove, UK", "ll": "50.8279319,-0.168749"}
+, {"city": "Marlow, UK", "ll": "51.5719443,-0.7769422"}
+, {"city": "Newark, UK", "ll": "53.0765,-0.81"}
+, {"city": "Farnham, UK", "ll": "51.214321,-0.798802"}
+, {"city": "Newbury, UK", "ll": "51.4014,-1.3231"}
+, {"city": "Rickmansworth, UK", "ll": "51.638763,-0.474131"}
+, {"city": "Sunningdale, UK", "ll": "51.3924544,-0.6301363"}
+, {"city": "Willenhall, UK", "ll": "52.585017,-2.057635"}
+, {"city": "New Malden, UK", "ll": "51.400663,-0.259263"}
+, {"city": "asdasda", "ll": ","}
 ]
