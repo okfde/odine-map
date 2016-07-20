@@ -6,6 +6,7 @@
 , {"city": "Berlin, Germany", "ll": "52.524268,13.40629"}
 , {"city": "Madrid, Spain", "ll": "40.4166909,-3.700345399999999"}
 , {"city": "Rome, Italy", "ll": "41.8905198,12.4942486"}
+, {"city": "Kiew, Ukraine", "ll": "50.4501,30.5234"}
 , {"city": "Kiev, Kyiv city, Ukraine, 02000", "ll": "50.4501,30.5234"}
 , {"city": "Київ, Kyiv city, Ukraine, 02000", "ll": "50.4501,30.5234"}
 , {"city": "Paris, France", "ll": "48.856614,2.3522219"}
@@ -173,6 +174,7 @@
 , {"city": "Kaluga, Kaluga Oblast, Russia", "ll": "54.5333333,36.2666667"}
 , {"city": "Belgorod, Belgorodskaya oblast, Russia", "ll": "50.6166667,36.5833333"}
 , {"city": "Zurich, Switzerland", "ll": "47.3686498,8.539182499999999"}
+, {"city": "Bern, Switzerland", "ll": "46.9480900,7.4474400"}
 , {"city": "Simferopol', Crimea, Ukraine, 95000", "ll": "44.952117,34.102417"}
 , {"city": "Bari", "ll": "41.1259135,16.8721133"}
 , {"city": "Vladimir, Vladimirskaya oblast, Russia", "ll": "56.1333333,40.4166667"}
@@ -577,5 +579,8 @@
 , {"city": "Sunningdale, UK", "ll": "51.3924544,-0.6301363"}
 , {"city": "Willenhall, UK", "ll": "52.585017,-2.057635"}
 , {"city": "New Malden, UK", "ll": "51.400663,-0.259263"}
-, {"city": "asdasda", "ll": ","}
+, {"city": "Nicosia, Cyprus", "ll": "35.185566,33.382275"}
+, {"city": "Jerusalem, Israel", "ll": "31.771959,35.217018"}
+, {"city": "Luxembourg, Luxembourg", "ll": "49.611622,6.131935"}
+, {"city": "Ankara, Turkey", "ll": "39.925533,32.866287"}
 ]

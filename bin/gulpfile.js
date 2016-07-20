@@ -37,12 +37,12 @@ gulp.task('tsv2json', function () {
 		return [parseFloat(ll[1]), parseFloat(ll[0])]
 	};
 
-	var findLatLng = function (city, country) {
+	var findLatLng = function (city, country, full) {
 		if (!city || city.length === 0) {
 			if (countries[country]) {
 				return getLatLngFromString(countries[country]);
 			}
-			console.log('no city, country not in list', country);
+			console.log('no city, country not in list', country, full);
 			return [0, 0];
 		}
 		var results = cities.filter(function (c) {
@@ -86,7 +86,7 @@ gulp.task('tsv2json', function () {
 		var feature = {
 			"type": "Feature",
 			"geometry": {
-				"coordinates": findLatLng(prepareCol(cols[6]), prepareCol(cols[1])),
+				"coordinates": findLatLng(prepareCol(cols[6]), prepareCol(cols[1]), cols),
 				"type": "Point"
 			},
 			properties: {
